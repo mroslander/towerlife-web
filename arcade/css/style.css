@@ -1,0 +1,242 @@
+/* ═══════════════════════════════════════════════════════════════
+   style.css — Shared arcade styles
+   All games import this sheet; game-specific rules go in a <style>
+   block or a per-game .css file.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Base ───────────────────────────────────────────────────── */
+html, body {
+  width: 100%;
+  height: 100%;
+  background: #0a0a0a;
+  color: #e0e0e0;
+  font-family: 'Courier New', Courier, monospace;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+
+/* ── Game container ─────────────────────────────────────────── */
+#game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 8px;
+  padding: 8px;
+}
+
+/* ── HUD strip ──────────────────────────────────────────────── */
+#hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 420px;
+  padding: 2px 8px;
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 70px;
+}
+
+.hud-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #555;
+  text-transform: uppercase;
+}
+
+.hud-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #00ff88;
+  line-height: 1.1;
+  min-width: 3ch;
+  text-align: center;
+}
+
+/* ── Icon button (pause etc.) ───────────────────────────────── */
+.btn-icon {
+  background: none;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: #666;
+  font-size: 17px;
+  padding: 4px 9px;
+  cursor: pointer;
+  line-height: 1;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-icon:hover,
+.btn-icon:focus-visible {
+  border-color: #555;
+  color: #ccc;
+  outline: none;
+}
+
+/* ── Canvas wrapper ─────────────────────────────────────────── */
+#canvas-wrapper {
+  position: relative;
+  border: 2px solid #1c1c1c;
+  box-shadow: 0 0 24px rgba(0, 255, 136, 0.07);
+  flex-shrink: 0;
+}
+
+#game-canvas {
+  display: block;
+}
+
+/* ── Overlays ───────────────────────────────────────────────── */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+/* Title displayed on the start screen */
+.game-title {
+  font-size: 52px;
+  letter-spacing: 10px;
+  color: #00ff88;
+  text-shadow:
+    0 0 12px #00ff88,
+    0 0 32px rgba(0, 255, 136, 0.4);
+  animation: arcade-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes arcade-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.65; }
+}
+
+.overlay h2 {
+  font-size: 30px;
+  letter-spacing: 5px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.overlay p {
+  font-size: 14px;
+  color: #888;
+  text-align: center;
+}
+
+.overlay-hint {
+  font-size: 12px;
+  color: #555;
+}
+
+.overlay-sub {
+  font-size: 11px;
+  color: #383838;
+}
+
+/* Score rows inside the Game Over overlay */
+.overlay-scores {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.overlay-score-row {
+  display: flex;
+  gap: 10px;
+  font-size: 15px;
+  color: #aaa;
+}
+
+.overlay-score-row .label {
+  min-width: 60px;
+  text-align: right;
+  color: #555;
+  letter-spacing: 1px;
+}
+
+.overlay-score-row .value {
+  color: #00ff88;
+  font-size: 18px;
+  min-width: 40px;
+}
+
+/* ── Primary button ─────────────────────────────────────────── */
+.btn-primary {
+  background: transparent;
+  border: 2px solid #00ff88;
+  border-radius: 3px;
+  color: #00ff88;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 10px 28px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background: #00ff88;
+  color: #0a0a0a;
+  outline: none;
+}
+
+/* ── Achievement toast ──────────────────────────────────────── */
+.achievement-toast {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: #111;
+  border: 1px solid #00ff88;
+  border-left: 4px solid #00ff88;
+  color: #00ff88;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 9px 14px;
+  border-radius: 3px;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateX(16px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  max-width: 240px;
+}
+
+.achievement-toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── Mute toggle ────────────────────────────────────────────── */
+.btn-icon.muted {
+  color: #333;
+  border-color: #1e1e1e;
+}
