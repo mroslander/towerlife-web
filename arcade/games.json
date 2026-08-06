@@ -1,0 +1,44 @@
+{
+  "games": [
+    {
+      "id": "snake",
+      "name": "Snake",
+      "description": "Classic snake. Eat, grow, don't crash.",
+      "url": "https://mroslander.github.io/towerlife-web/arcade/snake/index.html",
+      "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/snake/screenshot.png",
+      "purchasePrice": 100,
+      "playPrice": 1,
+      "starsRequired": 0
+    },
+    {
+      "id": "jewelrumble",
+      "name": "Jewel Rumble",
+      "description": "Swap gems, match 3+, beat the clock.",
+      "url": "https://mroslander.github.io/towerlife-web/arcade/jewelrumble/index.html",
+      "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/jewelrumble/screenshot.png",
+      "purchasePrice": 100,
+      "playPrice": 1,
+      "starsRequired": 0
+    },
+    {
+      "id": "marblemanic",
+      "name": "Marble Manic",
+      "description": "Shoot marbles, match 3+, buy more time.",
+      "url": "https://mroslander.github.io/towerlife-web/arcade/marblemanic/index.html",
+      "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/marblemanic/screenshot.png",
+      "purchasePrice": 100,
+      "playPrice": 1,
+      "starsRequired": 0
+    },
+    {
+      "id": "blockazoid",
+      "name": "Blockazoid",
+      "description": "Stack blocks, clear lines, beat the clock.",
+      "url": "https://mroslander.github.io/towerlife-web/arcade/blockazoid/index.html",
+      "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/blockazoid/screenshot.png",
+      "purchasePrice": 100,
+      "playPrice": 1,
+      "starsRequired": 0
+    }
+  ]
+}
