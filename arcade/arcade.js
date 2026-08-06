@@ -31,17 +31,17 @@
       ready:       true,
     },
     {
+      id:          'blockazoid',
+      title:       'Blockazoid',
+      description: 'Stack blocks, clear lines, beat the clock.',
+      path:        'blockazoid/index.html',
+      ready:       true,
+    },
+    {
       id:          'breakout',
       title:       'Breakout',
       description: 'Break all the bricks.',
       path:        'breakout/index.html',
-      ready:       false,
-    },
-    {
-      id:          'tetris',
-      title:       'Tetris',
-      description: 'Clear lines, beat gravity.',
-      path:        'tetris/index.html',
       ready:       false,
     },
     {
