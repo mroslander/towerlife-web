@@ -37,7 +37,7 @@
   const BUBBLE_R  = 19;
   const COL_SPACE = 40;   // horizontal centre-to-centre spacing
   const ROW_SPACE = 35;   // vertical centre-to-centre (COL_SPACE * sin60° ≈ 34.6)
-  const GRID_TOP  = 6;    // y of row-0 bubble centres (after gridOffsetY applied)
+  const GRID_TOP  = BUBBLE_R + 4;  // y of row-0 bubble centres — keeps top row fully inside canvas
   const GRID_ROWS = 11;   // total row slots (rows 0 – 10)
   const INIT_ROWS = 4;    // rows prefilled with marbles at game start
 
@@ -265,27 +265,22 @@
 
   // ── Add new row from top (grid slides down) ───────────────────────────
   function addNewRow() {
-    // Shift all data one row down; row GRID_ROWS-1 falls off.
-    // Column counts alternate (9, 8, 9 …) so remap on each shift:
-    //   even(9) → odd(8):  copy cols 0-7, drop col 8
-    //   odd(8)  → even(9): copy cols 0-7, new col 8 = empty
-    for (let r = GRID_ROWS - 1; r > 0; r--) {
-      const prev   = grid[r - 1];
-      const tCols  = colsInRow(r);
-      const newRow = new Array(tCols).fill(-1);
-      const copy   = Math.min(prev.length, tCols); // always 8
-      for (let c = 0; c < copy; c++) newRow[c] = prev[c];
-      grid[r] = newRow;
+    // Add TWO rows at once so parity is preserved: even rows stay even, odd stay odd.
+    // colsInRow(r) === colsInRow(r-2) always, so plain slice() copies correctly.
+    for (let r = GRID_ROWS - 1; r >= 2; r--) {
+      grid[r] = grid[r - 2].slice();
     }
-    // New top row (always even = 9 cols); bias towards active colours
-    const colorsPresent = getActiveColors();
-    grid[0] = Array.from({ length: colsInRow(0) }, () =>
-      Math.random() < 0.7 && colorsPresent.length >= 2
-        ? colorsPresent[rnd(colorsPresent.length)]
+    // New rows 0 (even, 9 cols) and 1 (odd, 8 cols); bias towards active colours
+    const present = getActiveColors();
+    const makeRow = r => Array.from({ length: colsInRow(r) }, () =>
+      Math.random() < 0.7 && present.length >= 2
+        ? present[rnd(present.length)]
         : rnd(MARBLE_TYPES)
     );
-    // Animate: grid slides in from above
-    gridOffsetY = -ROW_SPACE;
+    grid[0] = makeRow(0);
+    grid[1] = makeRow(1);
+    // Animate: slide two rows in from above
+    gridOffsetY = -ROW_SPACE * 2;
     // Tighten interval
     rowInterval = Math.max(NEW_ROW_MIN, rowInterval * NEW_ROW_DECAY);
     nextRowIn   = rowInterval;
@@ -438,7 +433,7 @@
       const floats = floatingPos.map(({ r: fr, c: fc }) => ({
         x: bubbleCX(fr, fc),
         y: bubbleCY(fr),
-        vy: -0.5,
+        vy: 0,
         color: grid[fr][fc],
       }));
       for (const { r: fr, c: fc } of floatingPos) grid[fr][fc] = -1;
@@ -890,13 +885,11 @@
       }
     }
 
-    // Float animation: disconnected bubbles fall away
-    if (floatList.length) {
-      const prog = 1 - floatTimer / FLOAT_DUR;
+    // Float animation: disconnected bubbles fall away (no fade, just physics drop)
+    if (animState === 'floating' && floatList.length) {
       for (const f of floatList) {
         ctx.save();
         ctx.translate(f.x, f.y);
-        ctx.globalAlpha = Math.max(0, 1 - prog * 1.6);
         drawMarble(f.color);
         ctx.restore();
       }
