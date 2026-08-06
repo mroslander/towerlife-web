@@ -24,6 +24,7 @@
   const NEW_ROW_FIRST   = 22.0;  // seconds before the first new row appears
   const NEW_ROW_DECAY   = 0.80;  // row interval shrinks by this factor each time
   const NEW_ROW_MIN     = 7.0;   // floor on the row-addition interval
+  const SLIDE_DUR       = 210;   // ms — next-marble slide-in animation duration
 
   // ══════════════════════════════════════════════════════════════════════
   //  GRID GEOMETRY
@@ -111,6 +112,9 @@
 
   // Projectile in flight
   let proj = null;  // { x, y, vx, vy, color }
+
+  // Next-marble slide-in animation
+  let slideMarble = null;  // { color, t }  t: 0→1
 
   // Animation state machine
   //   'idle'     – waiting for player to shoot
@@ -349,6 +353,10 @@
   // ── Shoot ─────────────────────────────────────────────────────────────
   function shoot() {
     if (animState !== 'idle') return;
+
+    // Snap any in-progress slide instantly so the cannon is correct
+    if (slideMarble) slideMarble = null;
+
     proj = {
       x: SHOOTER_X, y: SHOOTER_Y,
       vx: Math.cos(aimAngle) * SHOOT_SPEED,
@@ -356,6 +364,11 @@
       color: shootColor,
     };
     animState = 'flying';
+
+    // Advance the marble queue immediately and animate the incoming marble
+    slideMarble = { color: nextColor, t: 0 };
+    loadNextMarble();  // shootColor = old nextColor (= slideMarble.color), nextColor = new random
+
     GameAudio.beep({ frequency: 520, duration: 0.05, type: 'square', volume: 0.14 });
   }
 
@@ -402,9 +415,8 @@
       grid[snap.r][snap.c] = color;
       resolveMatches(snap.r, snap.c);
     } else {
-      // No valid slot; skip and load next marble
+      // No valid slot; queue was already advanced in shoot()
       animState = 'idle';
-      loadNextMarble();
     }
   }
 
@@ -458,9 +470,8 @@
       if (!hasAnyBubble()) respawnPending = true;
 
     } else {
-      // No match — load next marble immediately
+      // No match — queue already advanced in shoot()
       animState = 'idle';
-      loadNextMarble();
     }
   }
 
@@ -598,6 +609,7 @@
     gameElapsed    = 0;
     animState      = 'idle';
     proj           = null;
+    slideMarble    = null;
     popList        = []; floatList = [];
     particles.length = 0;
     aimAngle       = -Math.PI / 2;
@@ -682,6 +694,12 @@
         if (gridOffsetY >= 0) gridOffsetY = 0;
       }
 
+      // Slide-in animation for incoming marble
+      if (slideMarble) {
+        slideMarble.t += dt / SLIDE_DUR;
+        if (slideMarble.t >= 1) slideMarble = null;
+      }
+
       // New-row countdown
       updateRowTimer(dtSec);
 
@@ -698,7 +716,6 @@
             floatTimer = FLOAT_DUR;
           } else {
             animState = 'idle';
-            loadNextMarble();
             if (respawnPending) respawnGrid();
           }
         }
@@ -712,7 +729,6 @@
         if (floatTimer <= 0) {
           floatList = [];
           animState = 'idle';
-          loadNextMarble();
           if (respawnPending) respawnGrid();
         }
       }
@@ -778,9 +794,24 @@
     ctx.fill();
     ctx.stroke();
 
-    // Current marble sitting in the barrel
-    drawMarble(shootColor, BUBBLE_R - 3);
+    // Current marble sitting in the barrel (hidden while slide-in is playing)
+    if (!slideMarble) drawMarble(shootColor, BUBBLE_R - 3);
 
+    ctx.restore();
+  }
+
+  // Marble sliding from the NEXT preview position into the cannon
+  function drawSlideMarble() {
+    if (!slideMarble) return;
+    const t  = Math.min(1, slideMarble.t);
+    const et = 1 - Math.pow(1 - t, 3);        // ease-out cubic
+    const nx = CANVAS_W - 36;
+    const x  = nx + (SHOOTER_X - nx) * et;    // interpolate x from NEXT → SHOOTER
+    const r  = (BUBBLE_R - 5) + 2 * et;       // marble grows slightly as it arrives
+    ctx.save();
+    ctx.translate(x, SHOOTER_Y);
+    ctx.globalAlpha = 0.65 + 0.35 * et;
+    drawMarble(slideMarble.color, r);
     ctx.restore();
   }
 
@@ -895,8 +926,9 @@
       }
     }
 
-    // Shooter and current marble
+    // Shooter, current marble, and slide-in animation
     drawShooter();
+    drawSlideMarble();
 
     // Projectile in flight
     if (proj) {
