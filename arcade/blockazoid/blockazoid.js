@@ -1,9 +1,8 @@
 /**
  * blockazoid.js — Tetris-clone arcade game
  *
- * Stack falling blocks to clear lines.  A continuously burning timer keeps
- * the pressure on — clearing lines buys back time, and clearing more at once
- * rewards more.  The auto-drop speed also accelerates over time.
+ * Stack falling blocks to clear lines.  The auto-drop speed accelerates
+ * continuously — survive as long as possible and rack up a high score.
  *
  * Depends on (loaded via index.html):
  *   save.js · towerlife.js · audio.js · achievements.js · ui.js
@@ -14,10 +13,6 @@
   // ══════════════════════════════════════════════════════════════════════
   //  DIFFICULTY CONSTANTS  — adjust these to tune the game
   // ══════════════════════════════════════════════════════════════════════
-  const START_TIME     = 35;          // seconds at game start
-  const MAX_TIME       = 60;          // timer cap
-  const BURN_INC       = 0.018;       // burn-speed increase per elapsed real second
-  const BUMP           = [0, 2.5, 6.0, 11.0, 18.0]; // time bonus per lines cleared (index = count)
   const DROP_MS_START  = 800;         // auto-drop interval at game start (ms)
   const DROP_MS_MIN    = 80;          // fastest auto-drop interval (ms)
   const DROP_HALF_SECS = 25;          // seconds until drop interval halves
@@ -102,9 +97,6 @@
 
   const elScore      = document.getElementById('score');
   const elHigh       = document.getElementById('high-score');
-  const elTime       = document.getElementById('time-display');
-  const elTimerBar   = document.getElementById('timer-bar');
-  const elSpeed      = document.getElementById('speed-display');
   const elFinalScore = document.getElementById('final-score');
   const elFinalHigh  = document.getElementById('final-high');
   const elFinalLines = document.getElementById('final-lines');
@@ -123,7 +115,7 @@
   let holdUsed;      // can only hold once per spawned piece
 
   let score, highScore, linesCleared;
-  let timeLeft, burnSpeed, gameElapsed;
+  let gameElapsed;
   let running, paused;
   let rafId, lastTs;
   let dropTimer;     // ms accumulator for auto-drop
@@ -276,10 +268,8 @@
     // Capture row contents for particles before removing
     const rowData = flashRows.map(r => board[r].slice());
 
-    // Score + timer bump
-    score    += [0, 100, 300, 500, 800][n] * level;
+    score        += [0, 100, 300, 500, 800][n] * level;
     linesCleared += n;
-    timeLeft  = Math.min(timeLeft + BUMP[n], MAX_TIME);
 
     // Remove full rows (descending order so indices stay valid)
     const sorted = [...flashRows].sort((a, b) => b - a);
@@ -440,11 +430,6 @@
   // ══════════════════════════════════════════════════════════════════════
   //  HUD
   // ══════════════════════════════════════════════════════════════════════
-  function formatTime(t) {
-    if (t >= 10) return Math.ceil(t).toString();
-    return Math.max(0, t).toFixed(1);
-  }
-
   function formatSurvived(secs) {
     const s = Math.floor(secs);
     return s < 60 ? s + 's' : Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
@@ -453,17 +438,6 @@
   function updateHUD() {
     elScore.textContent = score;
     elHigh.textContent  = highScore;
-
-    const ratio = timeLeft / MAX_TIME;
-    elTime.textContent = formatTime(timeLeft);
-    elTime.classList.toggle('urgent', timeLeft < 8);
-
-    elTimerBar.style.width      = (Math.max(0, ratio) * 100).toFixed(1) + '%';
-    elTimerBar.style.background = ratio > 0.5 ? '#33ff99' : ratio > 0.25 ? '#ffcc00' : '#ff3366';
-
-    elSpeed.textContent = burnSpeed.toFixed(1) + '\u00d7';
-    const sf = Math.min((burnSpeed - 1) / 2, 1);
-    elSpeed.style.color = sf < 0.25 ? '#33ff99' : sf < 0.6 ? '#ffcc00' : '#ff3366';
   }
 
   // ══════════════════════════════════════════════════════════════════════
@@ -472,8 +446,6 @@
   function doStart() {
     score        = 0;
     linesCleared = 0;
-    timeLeft     = START_TIME;
-    burnSpeed    = 1.0;
     gameElapsed  = 0;
     dropTimer    = 0;
     lockTimer    = -1;
@@ -548,15 +520,7 @@
     lastTs = ts;
 
     if (!paused) {
-      const dtSec = dt / 1000;
-      gameElapsed += dtSec;
-      burnSpeed    = 1.0 + gameElapsed * BURN_INC;
-
-      timeLeft -= dtSec * burnSpeed;
-      if (timeLeft <= 0) {
-        timeLeft = 0; updateHUD(); draw();
-        doGameOver(); return;
-      }
+      gameElapsed += dt / 1000;
 
       if (flashRows) {
         flashTimer -= dt;

@@ -17,56 +17,6 @@
         0 0 12px #00eeff,
         0 0 32px rgba(0, 238, 255, 0.45);
     }
-
-    #sub-hud {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      max-width: 420px;
-      padding: 0 8px;
-      gap: 8px;
-    }
-
-    #time-display {
-      font-size: 22px;
-      font-weight: bold;
-      color: #ffcc00;
-      min-width: 36px;
-      text-align: right;
-      font-family: 'Courier New', Courier, monospace;
-      flex-shrink: 0;
-    }
-
-    #time-display.urgent {
-      color: #ff3366;
-      animation: arcade-pulse 0.5s ease-in-out infinite;
-    }
-
-    #timer-bar-wrap {
-      flex: 1;
-      height: 6px;
-      background: #1a1a2e;
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    #timer-bar {
-      height: 100%;
-      width: 100%;
-      background: #33ff99;
-      border-radius: 3px;
-      transition: background-color 0.4s;
-    }
-
-    #speed-display {
-      font-size: 10px;
-      letter-spacing: 1px;
-      color: #33ff99;
-      min-width: 30px;
-      text-align: right;
-      font-family: 'Courier New', Courier, monospace;
-      flex-shrink: 0;
-    }
   </style>
 </head>
 <body>
@@ -90,13 +40,6 @@
       </div>
     </div>
 
-    <!-- Timer strip ───────────────────────────────────────────── -->
-    <div id="sub-hud">
-      <span id="time-display">35</span>
-      <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
-      <span id="speed-display">1.0×</span>
-    </div>
-
     <!-- Canvas + overlays ────────────────────────────────────── -->
     <div id="canvas-wrapper">
       <canvas id="game-canvas"></canvas>
@@ -104,7 +47,7 @@
       <!-- Start screen -->
       <div id="overlay-start" class="overlay">
         <h1 class="game-title">BLOCKA<br>ZOID</h1>
-        <p class="overlay-hint">Stack blocks · Clear lines · Each line buys time</p>
+        <p class="overlay-hint">Stack blocks · Clear lines · It keeps getting faster</p>
         <button id="btn-start" class="btn-primary">START</button>
         <p class="overlay-sub">Tap · Enter · Space</p>
         <p class="overlay-sub">← → rotate · ↑ hard drop · C hold</p>
