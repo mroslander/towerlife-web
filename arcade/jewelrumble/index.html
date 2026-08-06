@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Jewelrumble — TowerLife Arcade</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    /* ── Jewelrumble overrides ───────────────────────────────── */
+    .game-title {
+      font-size: 36px;
+      letter-spacing: 6px;
+      line-height: 1.15;
+      text-align: center;
+      color: #cc33ff;
+      text-shadow:
+        0 0 12px #cc33ff,
+        0 0 32px rgba(204,51,255,0.45);
+    }
+
+    /* sub-HUD: timer bar + speed indicator */
+    #sub-hud {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 420px;
+      padding: 0 8px;
+      gap: 8px;
+    }
+
+    #time-display {
+      font-size: 22px;
+      font-weight: bold;
+      color: #ffcc00;
+      min-width: 36px;
+      text-align: right;
+      font-family: 'Courier New', Courier, monospace;
+      flex-shrink: 0;
+    }
+
+    #time-display.urgent {
+      color: #ff3366;
+      animation: arcade-pulse 0.5s ease-in-out infinite;
+    }
+
+    #timer-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: #1a1a2e;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    #timer-bar {
+      height: 100%;
+      width: 100%;
+      background: #33ff99;
+      border-radius: 3px;
+      transition: background-color 0.4s;
+    }
+
+    #speed-display {
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: #33ff99;
+      min-width: 30px;
+      text-align: right;
+      font-family: 'Courier New', Courier, monospace;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+
+    <!-- HUD ──────────────────────────────────────────────────── -->
+    <div id="hud">
+      <div class="hud-item">
+        <span class="hud-label">SCORE</span>
+        <span id="score" class="hud-value">0</span>
+      </div>
+
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button id="btn-mute"  class="btn-icon" title="Mute">🔊</button>
+        <button id="btn-pause" class="btn-icon" title="Pause (P)" disabled>⏸</button>
+      </div>
+
+      <div class="hud-item" style="align-items:flex-end;">
+        <span class="hud-label">BEST</span>
+        <span id="high-score" class="hud-value">0</span>
+      </div>
+    </div>
+
+    <!-- Timer strip ───────────────────────────────────────────── -->
+    <div id="sub-hud">
+      <span id="time-display">30</span>
+      <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+      <span id="speed-display">1.0×</span>
+    </div>
+
+    <!-- Canvas + overlays ────────────────────────────────────── -->
+    <div id="canvas-wrapper">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Start screen -->
+      <div id="overlay-start" class="overlay">
+        <h1 class="game-title">JEWEL<br>RUMBLE</h1>
+        <p class="overlay-hint">Swap gems · Match 3 or more · Each match buys time</p>
+        <button id="btn-start" class="btn-primary">START</button>
+        <p class="overlay-sub">Tap · Enter · Space</p>
+      </div>
+
+      <!-- Paused screen -->
+      <div id="overlay-pause" class="overlay hidden">
+        <h2>PAUSED</h2>
+        <button id="btn-resume" class="btn-primary">RESUME</button>
+        <p class="overlay-sub">P · Esc · or tap</p>
+      </div>
+
+      <!-- Game over screen -->
+      <div id="overlay-over" class="overlay hidden">
+        <h2>GAME OVER</h2>
+        <div class="overlay-scores">
+          <div class="overlay-score-row">
+            <span class="label">SCORE</span>
+            <span id="final-score" class="value">0</span>
+          </div>
+          <div class="overlay-score-row">
+            <span class="label">BEST</span>
+            <span id="final-high" class="value">0</span>
+          </div>
+          <div class="overlay-score-row">
+            <span class="label">SURVIVED</span>
+            <span id="final-time" class="value">0s</span>
+          </div>
+        </div>
+        <button id="btn-restart" class="btn-primary">PLAY AGAIN</button>
+        <p class="overlay-sub">Enter · Space · or tap</p>
+      </div>
+    </div>
+
+  </div><!-- #game-container -->
+
+  <!-- Common libraries -->
+  <script src="../common/save.js"></script>
+  <script src="../common/towerlife.js"></script>
+  <script src="../common/audio.js"></script>
+  <script src="../common/achievements.js"></script>
+  <script src="../common/ui.js"></script>
+  <!-- Game -->
+  <script src="jewelrumble.js"></script>
+</body>
+</html>
