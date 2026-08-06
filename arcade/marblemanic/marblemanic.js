@@ -450,10 +450,11 @@
       const bump = Math.max(BUMP_MIN, n * BUMP_PER_MARBLE + f * BUMP_PER_FLOAT);
       timeLeft = Math.min(timeLeft + bump, MAX_TIME);
 
-      // Start pop animation
+      // Start pop + float animations simultaneously on impact
       popList   = pops;
       popTimer  = POP_DUR;
       floatList = floats;
+      floatTimer = floats.length > 0 ? FLOAT_DUR + 120 : 0;  // starts right away
       animState = 'popping';
 
       updateHUD();
@@ -673,14 +674,16 @@
       gameElapsed += dtSec;
       burnSpeed    = 1.0 + gameElapsed * BURN_INC;
 
-      // Burn timer
-      timeLeft -= dtSec * burnSpeed;
-      if (timeLeft <= 0) {
-        timeLeft = 0;
-        updateHUD();
-        draw();
-        doGameOver();
-        return;
+      // Burn timer — paused while the shot marble is in flight
+      if (animState !== 'flying') {
+        timeLeft -= dtSec * burnSpeed;
+        if (timeLeft <= 0) {
+          timeLeft = 0;
+          updateHUD();
+          draw();
+          doGameOver();
+          return;
+        }
       }
 
       // Smooth grid-slide animation (new row entering from top)
@@ -698,6 +701,25 @@
       // New-row countdown
       updateRowTimer(dtSec);
 
+      // Float physics runs in parallel with any other state
+      if (floatList.length > 0) {
+        floatTimer -= dt;
+        // First 120 ms: bubbles sit still (visual pause after pop)
+        if (floatTimer <= FLOAT_DUR) {
+          for (const f of floatList) {
+            f.vy += dt * 0.022;  // gravity
+            f.y  += f.vy;
+          }
+        }
+        if (floatTimer <= 0) {
+          floatList = [];
+          if (animState === 'floating') {
+            animState = 'idle';
+            if (respawnPending) respawnGrid();
+          }
+        }
+      }
+
       // Phase updates
       if (animState === 'flying') {
         updateProjectile();
@@ -707,8 +729,7 @@
         if (popTimer <= 0) {
           popList = [];
           if (floatList.length > 0) {
-            animState  = 'floating';
-            floatTimer = FLOAT_DUR;
+            animState = 'floating';  // wait for in-progress float to finish
           } else {
             animState = 'idle';
             if (respawnPending) respawnGrid();
@@ -716,16 +737,7 @@
         }
 
       } else if (animState === 'floating') {
-        floatTimer -= dt;
-        for (const f of floatList) {
-          f.vy += dt * 0.022;  // gravity
-          f.y  += f.vy;
-        }
-        if (floatTimer <= 0) {
-          floatList = [];
-          animState = 'idle';
-          if (respawnPending) respawnGrid();
-        }
+        // physics handled above
       }
 
       updateParticles();
@@ -885,8 +897,8 @@
       }
     }
 
-    // Float animation: disconnected bubbles fall away (no fade, just physics drop)
-    if (animState === 'floating' && floatList.length) {
+    // Float animation: disconnected bubbles fall (runs from impact, parallel to pop)
+    if (floatList.length > 0) {
       for (const f of floatList) {
         ctx.save();
         ctx.translate(f.x, f.y);
