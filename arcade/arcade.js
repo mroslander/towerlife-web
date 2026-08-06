@@ -17,6 +17,20 @@
       ready:       true,
     },
     {
+      id:          'jewelrumble',
+      title:       'Jewel Rumble',
+      description: 'Swap gems, match 3+, beat the clock.',
+      path:        'jewelrumble/index.html',
+      ready:       true,
+    },
+    {
+      id:          'marblemanic',
+      title:       'Marble Manic',
+      description: 'Shoot marbles, match 3+, buy more time.',
+      path:        'marblemanic/index.html',
+      ready:       true,
+    },
+    {
       id:          'breakout',
       title:       'Breakout',
       description: 'Break all the bricks.',
