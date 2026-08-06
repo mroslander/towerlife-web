@@ -30,10 +30,12 @@
   // ══════════════════════════════════════════════════════════════════════
   const CANVAS_W  = 360;
   const CANVAS_H  = 500;
-  const COLS      = 9;
+  // Hex offset grid: even rows have 9 bubbles, odd rows have 8 (shifted right by half)
+  const COLS_EVEN = 9;    // columns in even rows (0, 2, 4 …)
+  const COLS_ODD  = 8;    // columns in odd  rows (1, 3, 5 …)
   const BUBBLE_R  = 19;
-  const COL_SPACE = 40;   // horizontal distance between bubble centres
-  const ROW_SPACE = 38;   // vertical distance between bubble centres
+  const COL_SPACE = 40;   // horizontal centre-to-centre spacing
+  const ROW_SPACE = 35;   // vertical centre-to-centre (COL_SPACE * sin60° ≈ 34.6)
   const GRID_TOP  = 6;    // y of row-0 bubble centres (after gridOffsetY applied)
   const GRID_ROWS = 11;   // total row slots (rows 0 – 10)
   const INIT_ROWS = 4;    // rows prefilled with marbles at game start
@@ -128,36 +130,44 @@
   const particles = [];
 
   // ── Grid helpers ──────────────────────────────────────────────────────
-  function bubbleCX(r, c) { return 20 + c * COL_SPACE; }
+  function colsInRow(r)   { return r % 2 === 0 ? COLS_EVEN : COLS_ODD; }
+  // Even rows: centres at x = 20, 60, 100 … 340  (left-aligned, span = 360)
+  // Odd rows:  centres at x = 40, 80, 120 … 320  (offset right by 20)
+  function bubbleCX(r, c) { return r % 2 === 0 ? 20 + c * COL_SPACE : 40 + c * COL_SPACE; }
   function bubbleCY(r)    { return GRID_TOP + r * ROW_SPACE + gridOffsetY; }
   function rnd(n)         { return Math.floor(Math.random() * n); }
   function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
-  // ── 8-directional neighbours ──────────────────────────────────────────
+  // ── Hex neighbours (6-connected offset grid) ─────────────────────────
+  // Even rows shift left relative to odd rows.
   function neighbors(r, c) {
+    const even = r % 2 === 0;
     return [
-      [r - 1, c - 1], [r - 1, c], [r - 1, c + 1],
-      [r,     c - 1],              [r,     c + 1],
-      [r + 1, c - 1], [r + 1, c], [r + 1, c + 1],
+      [r,     c - 1],
+      [r,     c + 1],
+      even ? [r - 1, c - 1] : [r - 1, c],
+      even ? [r - 1, c]     : [r - 1, c + 1],
+      even ? [r + 1, c - 1] : [r + 1, c],
+      even ? [r + 1, c]     : [r + 1, c + 1],
     ];
   }
 
   function validCell(r, c) {
-    return r >= 0 && r < GRID_ROWS && c >= 0 && c < COLS;
+    return r >= 0 && r < GRID_ROWS && c >= 0 && c < colsInRow(r);
   }
 
   // ── Cluster detection (flood fill, same colour) ───────────────────────
   function findCluster(r, c) {
     const color   = grid[r][c];
     if (color < 0) return [];
-    const visited = new Set([r * COLS + c]);
+    const visited = new Set([r * 10 + c]);
     const stack   = [[r, c]];
     const result  = [];
     while (stack.length) {
       const [cr, cc] = stack.pop();
       result.push({ r: cr, c: cc });
       for (const [nr, nc] of neighbors(cr, cc)) {
-        const key = nr * COLS + nc;
+        const key = nr * 10 + nc;
         if (!visited.has(key) && validCell(nr, nc) && grid[nr][nc] === color) {
           visited.add(key);
           stack.push([nr, nc]);
@@ -171,16 +181,16 @@
   function findFloating() {
     const attached = new Set();
     const queue    = [];
-    for (let c = 0; c < COLS; c++) {
+    for (let c = 0; c < colsInRow(0); c++) {
       if (grid[0][c] !== -1) {
-        attached.add(c);   // key = 0 * COLS + c = c
+        attached.add(c);   // key = 0 * 10 + c = c
         queue.push([0, c]);
       }
     }
     while (queue.length) {
       const [r, c] = queue.shift();
       for (const [nr, nc] of neighbors(r, c)) {
-        const key = nr * COLS + nc;
+        const key = nr * 10 + nc;
         if (!attached.has(key) && validCell(nr, nc) && grid[nr][nc] !== -1) {
           attached.add(key);
           queue.push([nr, nc]);
@@ -189,8 +199,8 @@
     }
     const floating = [];
     for (let r = 0; r < GRID_ROWS; r++)
-      for (let c = 0; c < COLS; c++)
-        if (grid[r][c] !== -1 && !attached.has(r * COLS + c))
+      for (let c = 0; c < colsInRow(r); c++)
+        if (grid[r][c] !== -1 && !attached.has(r * 10 + c))
           floating.push({ r, c });
     return floating;
   }
@@ -204,13 +214,15 @@
 
   function snapToGrid(px, py) {
     const rawR = (py - GRID_TOP - gridOffsetY) / ROW_SPACE;
-    const rawC = (px - 20) / COL_SPACE;
     const candidates = [];
 
     for (let dr = -1; dr <= 1; dr++) {
+      const r    = clamp(Math.round(rawR + dr), 0, GRID_ROWS - 1);
+      const cols = colsInRow(r);
+      const xOff = r % 2 === 0 ? 20 : 40;
+      const rawC = (px - xOff) / COL_SPACE;
       for (let dc = -2; dc <= 2; dc++) {
-        const r = clamp(Math.round(rawR + dr), 0, GRID_ROWS - 1);
-        const c = clamp(Math.round(rawC + dc), 0, COLS - 1);
+        const c = clamp(Math.round(rawC + dc), 0, cols - 1);
         if (grid[r][c] !== -1) continue;
         if (r > 0 && !hasAdjacentBubble(r, c)) continue;
         const cx = bubbleCX(r, c);
@@ -227,7 +239,7 @@
   // ── Grid init ─────────────────────────────────────────────────────────
   function initGrid() {
     grid = Array.from({ length: GRID_ROWS }, (_, r) =>
-      Array.from({ length: COLS }, () => r < INIT_ROWS ? rnd(MARBLE_TYPES) : -1)
+      Array.from({ length: colsInRow(r) }, () => r < INIT_ROWS ? rnd(MARBLE_TYPES) : -1)
     );
     gridOffsetY = 0;
     rowInterval = NEW_ROW_FIRST;
@@ -236,32 +248,39 @@
 
   function hasAnyBubble() {
     for (let r = 0; r < GRID_ROWS; r++)
-      for (let c = 0; c < COLS; c++)
+      for (let c = 0; c < colsInRow(r); c++)
         if (grid[r][c] !== -1) return true;
     return false;
   }
 
   function respawnGrid() {
     for (let r = 0; r < GRID_ROWS; r++)
-      for (let c = 0; c < COLS; c++)
-        grid[r][c] = r < INIT_ROWS ? rnd(MARBLE_TYPES) : -1;
+      grid[r] = Array.from({ length: colsInRow(r) }, () => r < INIT_ROWS ? rnd(MARBLE_TYPES) : -1);
     respawnPending = false;
   }
 
   // ── Add new row from top (grid slides down) ───────────────────────────
   function addNewRow() {
-    // Shift all data one row down; row GRID_ROWS-1 falls off
+    // Shift all data one row down; row GRID_ROWS-1 falls off.
+    // Column counts alternate (9, 8, 9 …) so remap on each shift:
+    //   even(9) → odd(8):  copy cols 0-7, drop col 8
+    //   odd(8)  → even(9): copy cols 0-7, new col 8 = empty
     for (let r = GRID_ROWS - 1; r > 0; r--) {
-      grid[r] = grid[r - 1].slice();
+      const prev   = grid[r - 1];
+      const tCols  = colsInRow(r);
+      const newRow = new Array(tCols).fill(-1);
+      const copy   = Math.min(prev.length, tCols); // always 8
+      for (let c = 0; c < copy; c++) newRow[c] = prev[c];
+      grid[r] = newRow;
     }
-    // New random top row (bias towards colours already present for cleaner matches)
+    // New top row (always even = 9 cols); bias towards active colours
     const colorsPresent = getActiveColors();
-    grid[0] = Array.from({ length: COLS }, () =>
+    grid[0] = Array.from({ length: colsInRow(0) }, () =>
       Math.random() < 0.7 && colorsPresent.length >= 2
         ? colorsPresent[rnd(colorsPresent.length)]
         : rnd(MARBLE_TYPES)
     );
-    // Animate: start shifted one row above, slide smoothly to correct position
+    // Animate: grid slides in from above
     gridOffsetY = -ROW_SPACE;
     // Tighten interval
     rowInterval = Math.max(NEW_ROW_MIN, rowInterval * NEW_ROW_DECAY);
@@ -271,14 +290,14 @@
   function getActiveColors() {
     const seen = new Set();
     for (let r = 0; r < GRID_ROWS; r++)
-      for (let c = 0; c < COLS; c++)
+      for (let c = 0; c < colsInRow(r); c++)
         if (grid[r][c] >= 0) seen.add(grid[r][c]);
     return Array.from(seen);
   }
 
   function getBottomFilledRow() {
     for (let r = GRID_ROWS - 1; r >= 0; r--)
-      for (let c = 0; c < COLS; c++)
+      for (let c = 0; c < colsInRow(r); c++)
         if (grid[r][c] !== -1) return r;
     return -1;
   }
@@ -312,7 +331,7 @@
       if (y < GRID_TOP + gridOffsetY + GRID_ROWS * ROW_SPACE + BUBBLE_R * 2) {
         const rawR = (y - GRID_TOP - gridOffsetY) / ROW_SPACE;
         for (let r = Math.max(0, Math.floor(rawR) - 1); r <= Math.min(GRID_ROWS - 1, Math.ceil(rawR) + 1); r++) {
-          for (let c = 0; c < COLS; c++) {
+          for (let c = 0; c < colsInRow(r); c++) {
             if (grid[r][c] < 0) continue;
             if (Math.hypot(x - bubbleCX(r, c), y - bubbleCY(r)) < BUBBLE_R * 2) {
               pts.push({ x, y });
@@ -362,10 +381,10 @@
 
     // Collision with grid bubbles
     const rawR = (proj.y - GRID_TOP - gridOffsetY) / ROW_SPACE;
-    const rMin = Math.max(0,            Math.floor(rawR) - 1);
+    const rMin = Math.max(0,             Math.floor(rawR) - 1);
     const rMax = Math.min(GRID_ROWS - 1, Math.ceil(rawR)  + 1);
     for (let r = rMin; r <= rMax; r++) {
-      for (let c = 0; c < COLS; c++) {
+      for (let c = 0; c < colsInRow(r); c++) {
         if (grid[r][c] < 0) continue;
         if (Math.hypot(proj.x - bubbleCX(r, c), proj.y - bubbleCY(r)) < BUBBLE_R * 1.92) {
           landProjectile();
@@ -817,7 +836,7 @@
 
     // Grid: static bubbles
     for (let r = 0; r < GRID_ROWS; r++) {
-      for (let c = 0; c < COLS; c++) {
+      for (let c = 0; c < colsInRow(r); c++) {
         const color = grid[r][c];
         if (color < 0) continue;
         ctx.save();
