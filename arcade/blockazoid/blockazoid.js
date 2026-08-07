@@ -509,7 +509,7 @@
     overlayOver.classList.remove('hidden');
     document.getElementById('btn-pause').disabled = true;
     GameAudio.die();
-    TowerLife.submitScore(score);
+    TowerLife.onGameOver(score, { highScore, linesCleared });
   }
 
   // ══════════════════════════════════════════════════════════════════════

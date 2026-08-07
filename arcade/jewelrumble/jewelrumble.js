@@ -467,7 +467,8 @@
 
     overlayOver.classList.remove('hidden');
     document.getElementById('btn-pause').disabled = true;
-    TowerLife.submitScore(score);
+    GameAudio.die();
+    TowerLife.onGameOver(score, { highScore });
   }
 
   // ── Game loop ─────────────────────────────────────────────────
