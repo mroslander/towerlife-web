@@ -444,6 +444,7 @@
   //  GAME CONTROL
   // ══════════════════════════════════════════════════════════════════════
   function doStart() {
+    if (!TowerLife.Credits.consume(doStart)) return;
     score        = 0;
     linesCleared = 0;
     gameElapsed  = 0;

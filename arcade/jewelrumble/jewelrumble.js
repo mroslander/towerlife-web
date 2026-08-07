@@ -410,6 +410,7 @@
 
   // ── Game control ──────────────────────────────────────────────
   function doStart() {
+    if (!TowerLife.Credits.consume(doStart)) return;
     score       = 0;
     timeLeft    = START_TIME;
     burnSpeed   = 1.0;
