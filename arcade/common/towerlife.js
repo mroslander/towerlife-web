@@ -1,10 +1,12 @@
 /**
  * towerlife.js — Unity ↔ WebView communication bridge
  *
- * In production this runs inside a Vuplex WebView embedded in the Unity game.
+ * In production this runs inside a UniWebView embedded in the Unity game.
  * In standalone browser mode (dev/testing) all calls are no-ops that log to console.
  *
- * Message protocol: JSON strings posted over window.vuplex (Vuplex WebView API).
+ * Message protocol:
+ *   Outbound (web → Unity): window.uniwebview channel messaging API
+ *   Inbound  (Unity → web): Unity calls EvaluateJavaScript("window.__towerlife_onMessage(json)")
  *
  * Outbound message types (web → Unity):
  *   { type: 'GAME_READY',      gameId }
@@ -21,9 +23,9 @@
   'use strict';
 
   const TowerLife = {
-    /** True when running inside the Vuplex WebView. */
+    /** True when running inside UniWebView. */
     get isUnity() {
-      return typeof window.vuplex !== 'undefined';
+      return typeof window.uniwebview !== 'undefined';
     },
 
     /**
@@ -60,24 +62,28 @@
     },
 
     /**
-     * Register a handler for messages sent from Unity.
+     * Register a handler for messages sent from Unity → web.
+     * Unity side must call:
+     *   webView.EvaluateJavaScript("window.__towerlife_onMessage('" + json + "')", null);
      * @param {function({ type: string, ...}): void} handler
      */
     onMessage(handler) {
       if (!this.isUnity) return;
-      window.vuplex.addEventListener('message', (event) => {
+      window.__towerlife_onMessage = function (data) {
         try {
-          handler(JSON.parse(event.data));
+          handler(typeof data === 'string' ? JSON.parse(data) : data);
         } catch (e) {
-          console.warn('[TowerLife] Failed to parse inbound message:', event.data);
+          console.warn('[TowerLife] Failed to parse inbound message:', data);
         }
-      });
+      };
     },
 
     // ── private ────────────────────────────────────────────────────
     _send(payload) {
       if (this.isUnity) {
-        window.vuplex.postMessage(JSON.stringify(payload));
+        // UniWebView channel messaging: send(action, data)
+        // Unity receives this via OnChannelMessageReceived with message.action == payload.type
+        window.uniwebview.send(payload.type, JSON.stringify(payload));
       } else {
         console.log('[TowerLife Bridge →]', payload);
       }
