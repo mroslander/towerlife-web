@@ -331,9 +331,41 @@
     return (r >= 0 && r < ROWS && c >= 0 && c < COLS) ? { r, c } : null;
   }
 
+  function pointerPx(e) {
+    const rect = canvas.getBoundingClientRect();
+    const sx = canvas.width  / rect.width;
+    const sy = canvas.height / rect.height;
+    return {
+      x: (e.clientX - rect.left) * sx,
+      y: (e.clientY - rect.top)  * sy,
+    };
+  }
+
   canvas.addEventListener('pointerdown', e => {
     if (!running || paused || phase !== 'idle') return;
-    ptrStart = pointerCell(e);
+    const cell = pointerCell(e);
+    if (!cell) return;
+    const px = pointerPx(e);
+    ptrStart = { r: cell.r, c: cell.c, px: px.x, py: px.y };
+    canvas.setPointerCapture(e.pointerId);
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    if (!running || paused || phase !== 'idle' || !ptrStart) return;
+    const px = pointerPx(e);
+    const dx = px.x - ptrStart.px;
+    const dy = px.y - ptrStart.py;
+    if (Math.abs(dx) < CELL / 2 && Math.abs(dy) < CELL / 2) return;
+    // Determine dominant direction and derive target cell
+    let dr = 0, dc = 0;
+    if (Math.abs(dx) >= Math.abs(dy)) { dc = dx > 0 ? 1 : -1; }
+    else                              { dr = dy > 0 ? 1 : -1; }
+    const target = { r: ptrStart.r + dr, c: ptrStart.c + dc };
+    if (target.r >= 0 && target.r < ROWS && target.c >= 0 && target.c < COLS) {
+      selected = null;
+      beginSwap(ptrStart, target);
+    }
+    ptrStart = null;
   });
 
   canvas.addEventListener('pointerup', e => {
