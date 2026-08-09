@@ -50,8 +50,10 @@
   let held  = [];      // Array<boolean>       — 5 hold flags
   let chips = STARTING_CHIPS;
   let best  = 0;
-  let state = 'start'; // 'start' | 'idle' | 'holding' | 'result' | 'gameover'
-  let muted = false;
+  let state = 'start'; // 'start' | 'idle' | 'holding' | 'result' | 'doubling' | 'gameover'
+  let muted       = false;
+  let doubleStake = 0;    // chips at stake in the doubling round
+  let doubleCard  = null; // card drawn for the doubling mini-game
 
   // DOM references
   let cardEls    = []; // 5 .card elements
@@ -72,6 +74,9 @@
     document.getElementById('btn-start').addEventListener('click', onStartClick);
     document.getElementById('btn-restart').addEventListener('click', onStartClick);
     document.getElementById('btn-mute').addEventListener('click', onMuteClick);
+    document.getElementById('btn-dbl-high').addEventListener('click', () => onDoubleGuess('high'));
+    document.getElementById('btn-dbl-low').addEventListener('click', () => onDoubleGuess('low'));
+    document.getElementById('btn-dbl-collect').addEventListener('click', onDoubleCollect);
 
     TowerLife.onMessage(handleUnityMessage);
     TowerLife.onGameReady('videopoker');
@@ -217,33 +222,25 @@
       document.getElementById(result.elId).classList.add('highlight');
     }
 
+    checkAchievements(result);
+
     if (winAmount > 0) {
-      chips += winAmount;
       setInfoBar(result.name, '+' + winAmount + ' CHIP' + (winAmount !== 1 ? 'S' : ''));
       GameAudio.score();
+      // Offer double-or-nothing after a brief pause so the player sees the result
+      setTimeout(() => enterDoublingPhase(winAmount), 900);
     } else {
       setInfoBar('NO WIN', '');
       GameAudio.die();
-    }
-
-    if (chips > best) {
-      best = chips;
-      Save.save('vp_best', best);
-      UI.setScore('best-display', best);
-      Achievements.unlock('vp_new_best', 'New Best!');
-    }
-
-    UI.setScore('chips-display', chips);
-    TowerLife.sendScore(chips);
-    checkAchievements(result);
-
-    if (chips < BET) {
-      // Session ends — wait a moment so player can see the result
-      setTimeout(() => enterState('gameover'), 1800);
-    } else {
-      btnDeal.textContent = 'DEAL';
-      btnDeal.disabled    = false;
-      state = 'result';
+      UI.setScore('chips-display', chips);
+      TowerLife.sendScore(chips);
+      if (chips < BET) {
+        setTimeout(() => enterState('gameover'), 1800);
+      } else {
+        btnDeal.textContent = 'DEAL';
+        btnDeal.disabled    = false;
+        state = 'result';
+      }
     }
   }
 
@@ -251,19 +248,22 @@
   function enterState(newState) {
     state = newState;
 
-    const overlayStart = document.getElementById('overlay-start');
-    const overlayOver  = document.getElementById('overlay-over');
+    const overlayStart  = document.getElementById('overlay-start');
+    const overlayOver   = document.getElementById('overlay-over');
+    const overlayDouble = document.getElementById('overlay-double');
 
     overlayStart.classList.toggle('hidden', newState !== 'start');
     overlayOver.classList.toggle('hidden', newState !== 'gameover');
+    overlayDouble.classList.toggle('hidden', newState !== 'doubling');
 
     // Hide the deal button while an overlay is showing
     btnDeal.style.display =
-      (newState === 'start' || newState === 'gameover') ? 'none' : '';
+      (newState === 'start' || newState === 'gameover' || newState === 'doubling') ? 'none' : '';
 
     if (newState === 'start' || newState === 'idle') {
       for (let i = 0; i < 5; i++) {
         cardEls[i].className = 'card face-down';
+        cardEls[i].innerHTML = '';
         holdLabels[i].classList.remove('visible');
       }
     }
@@ -362,12 +362,23 @@
   }
 
   // ── Achievements ───────────────────────────────────────────────
+  // Hand-based achievements (called from resolveHand before chips change)
   function checkAchievements(result) {
     if (result.id === 'royal') Achievements.unlock('vp_royal_flush',    'Royal Flush!');
     if (result.id === 'sf')    Achievements.unlock('vp_straight_flush', 'Straight Flush!');
     if (result.id === 'foak')  Achievements.unlock('vp_four_of_a_kind', 'Four of a Kind!');
-    if (chips >=  50)          Achievements.unlock('vp_chips_50',       '50 Chips!');
-    if (chips >= 100)          Achievements.unlock('vp_chips_100',      '100 Chips!');
+  }
+
+  // Persist best and unlock chip-milestone achievements (called when chips increase)
+  function updateBest() {
+    if (chips > best) {
+      best = chips;
+      Save.save('vp_best', best);
+      UI.setScore('best-display', best);
+      Achievements.unlock('vp_new_best', 'New Best!');
+    }
+    if (chips >=  50) Achievements.unlock('vp_chips_50',  '50 Chips!');
+    if (chips >= 100) Achievements.unlock('vp_chips_100', '100 Chips!');
   }
 
   // ── Unity message handler ──────────────────────────────────────
@@ -389,6 +400,129 @@
   function updateMuteBtn() {
     const btn = document.getElementById('btn-mute');
     if (btn) btn.textContent = muted ? '🔇' : '🔊';
+  }
+
+  // ── Double-or-nothing mini-game ────────────────────────────────
+
+  function enterDoublingPhase(stake) {
+    doubleStake = stake;
+
+    const dblCard = document.getElementById('dbl-card');
+    dblCard.className = 'card face-down';
+    dblCard.innerHTML = '';
+
+    document.getElementById('dbl-amount').textContent = doubleStake;
+    const resultEl = document.getElementById('dbl-result');
+    resultEl.textContent = '';
+    resultEl.className   = '';
+
+    document.getElementById('btn-dbl-low').disabled     = false;
+    document.getElementById('btn-dbl-high').disabled    = false;
+    document.getElementById('btn-dbl-collect').disabled = false;
+
+    enterState('doubling');
+  }
+
+  function onDoubleCollect() {
+    chips += doubleStake;
+    doubleStake = 0;
+    updateBest();
+    UI.setScore('chips-display', chips);
+    TowerLife.sendScore(chips);
+    GameAudio.eat();
+
+    if (chips < BET) {
+      enterState('gameover');
+    } else {
+      enterState('idle');
+    }
+  }
+
+  function onDoubleGuess(guess) {
+    // Lock buttons while the card is being revealed
+    document.getElementById('btn-dbl-low').disabled     = true;
+    document.getElementById('btn-dbl-high').disabled    = true;
+    document.getElementById('btn-dbl-collect').disabled = true;
+
+    // Pick a random card for the doubling round
+    doubleCard = {
+      rank: RANKS[Math.floor(Math.random() * RANKS.length)],
+      suit: SUITS[Math.floor(Math.random() * SUITS.length)],
+    };
+
+    // Brief tension pause before revealing
+    setTimeout(() => revealDoubleCard(guess), 650);
+  }
+
+  function revealDoubleCard(guess) {
+    const dblCardEl = document.getElementById('dbl-card');
+    const resultEl  = document.getElementById('dbl-result');
+    const rankIdx   = RANKS.indexOf(doubleCard.rank);
+    const isRed     = RED_SUITS.has(doubleCard.suit);
+
+    // Flip card face-up using the deal animation
+    dblCardEl.className = 'card ' + (isRed ? 'red' : 'black') + ' dealing';
+    dblCardEl.innerHTML =
+      '<div class="corner corner-tl">' + doubleCard.rank + '<small>' + doubleCard.suit + '</small></div>' +
+      '<div class="suit-center">'      + doubleCard.suit + '</div>' +
+      '<div class="corner corner-br">' + doubleCard.rank + '<small>' + doubleCard.suit + '</small></div>';
+    dblCardEl.addEventListener('animationend', () => dblCardEl.classList.remove('dealing'), { once: true });
+
+    // Ace counts as 1 (LOW). 7 is neutral and pays the current stake.
+    // LOW  = A, 2-6  (indices 0-4 and 12)
+    // HIGH = 8-K     (indices 6-11)
+    // 7    = neutral (index 5) — player collects the stake, doubling ends
+    const isSeven = rankIdx === 5;
+    const isLow   = rankIdx <= 4 || rankIdx === 12; // A, 2, 3, 4, 5, 6
+    const isHigh  = rankIdx >= 6 && rankIdx <= 11;  // 8, 9, 10, J, Q, K
+    const won = (guess === 'low' && isLow) || (guess === 'high' && isHigh);
+
+    setTimeout(() => {
+      if (isSeven) {
+        // 7 is in the player's favour: collect current stake, end doubling
+        chips += doubleStake;
+        updateBest();
+        UI.setScore('chips-display', chips);
+        TowerLife.sendScore(chips);
+        resultEl.textContent = 'SEVEN \u2014 COLLECT!';
+        resultEl.className   = 'push';
+        doubleStake          = 0;
+        GameAudio.eat();
+        setTimeout(endDoublingRound, 1600);
+      } else if (won) {
+        doubleStake *= 2;
+        resultEl.textContent = 'WIN! \xd72 \u2014 ' + doubleStake + ' CHIPS';
+        resultEl.className   = 'win';
+        GameAudio.score();
+        // Offer another doubling round
+        setTimeout(() => {
+          document.getElementById('dbl-amount').textContent = doubleStake;
+          resultEl.textContent = '';
+          resultEl.className   = '';
+          dblCardEl.className  = 'card face-down';
+          dblCardEl.innerHTML  = '';
+          document.getElementById('btn-dbl-low').disabled     = false;
+          document.getElementById('btn-dbl-high').disabled    = false;
+          document.getElementById('btn-dbl-collect').disabled = false;
+        }, 1500);
+      } else {
+        resultEl.textContent = 'BUST!';
+        resultEl.className   = 'lose';
+        doubleStake          = 0;
+        GameAudio.die();
+        setTimeout(endDoublingRound, 1600);
+      }
+    }, 350);
+  }
+
+  function endDoublingRound() {
+    UI.setScore('chips-display', chips);
+    TowerLife.sendScore(chips);
+    if (chips < BET) {
+      enterState('gameover');
+    } else {
+      enterState('idle');
+    }
   }
 
   // ── Boot ───────────────────────────────────────────────────────

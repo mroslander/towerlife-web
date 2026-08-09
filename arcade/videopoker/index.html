@@ -196,6 +196,79 @@
       opacity: 0.3;
       pointer-events: none;
     }
+
+    /* ── Double-or-nothing overlay ─────────────────────────── */
+
+    #game-container { position: relative; }
+
+    #overlay-double .dbl-label {
+      font-size: 15px;
+      letter-spacing: 4px;
+      color: #ffdd00;
+      text-shadow: 0 0 10px rgba(255, 221, 0, 0.45);
+    }
+
+    #overlay-double .dbl-stake {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #555;
+    }
+
+    #overlay-double .dbl-stake #dbl-amount {
+      color: #ffdd00;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    #dbl-card {
+      /* inherits .card sizing; positioned inside the overlay */
+      cursor: default;
+    }
+
+    #dbl-result {
+      font-size: 13px;
+      letter-spacing: 2px;
+      min-height: 20px;
+      text-align: center;
+    }
+
+    #dbl-result.win  { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.5); }
+    #dbl-result.lose { color: #ff4444; text-shadow: 0 0 8px rgba(255,68,68,0.5); }
+    #dbl-result.push { color: #ffdd00; text-shadow: 0 0 8px rgba(255,221,0,0.5); }
+
+    #dbl-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    #btn-dbl-low, #btn-dbl-high {
+      font-size: 13px;
+      padding: 10px 18px;
+      letter-spacing: 2px;
+    }
+
+    #btn-dbl-collect {
+      font-size: 11px;
+      padding: 8px 14px;
+      letter-spacing: 2px;
+      border-color: #888;
+      color: #888;
+    }
+
+    #btn-dbl-collect:hover { border-color: #aaa; color: #aaa; }
+
+    #btn-dbl-low:disabled,
+    #btn-dbl-high:disabled,
+    #btn-dbl-collect:disabled { opacity: 0.3; pointer-events: none; }
+
+    .dbl-hint {
+      font-size: 10px;
+      color: #333;
+      letter-spacing: 1px;
+    }
   </style>
 </head>
 <body>
@@ -279,6 +352,19 @@
         </div>
       </div>
       <button id="btn-restart" class="btn-primary">PLAY AGAIN</button>
+    </div>
+
+    <div id="overlay-double" class="overlay hidden">
+      <div class="dbl-label">DOUBLE OR NOTHING?</div>
+      <div class="dbl-stake">AT STAKE: <span id="dbl-amount">0</span> CHIPS</div>
+      <div id="dbl-card" class="card face-down"></div>
+      <div id="dbl-result"></div>
+      <div id="dbl-buttons">
+        <button id="btn-dbl-low"     class="btn-primary">◄ LOW</button>
+        <button id="btn-dbl-collect" class="btn-primary">COLLECT</button>
+        <button id="btn-dbl-high"    class="btn-primary">HIGH ►</button>
+      </div>
+      <div class="dbl-hint">A–6 = LOW &nbsp;&middot;&nbsp; 7 = COLLECT &nbsp;&middot;&nbsp; 8–K = HIGH</div>
     </div>
 
   </div><!-- #game-container -->
