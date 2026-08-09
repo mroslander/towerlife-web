@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Video Poker — TowerLife Casino</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    /* ── Video Poker specific ───────────────────────────────── */
+
+    #game-container {
+      gap: 6px;
+      padding: 6px 8px;
+    }
+
+    /* Pay table */
+    #pay-table {
+      width: 100%;
+      max-width: 380px;
+      background: rgba(0, 60, 10, 0.35);
+      border: 1px solid #143a14;
+      border-radius: 4px;
+      padding: 5px 10px;
+    }
+
+    .pay-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 1.5px 0;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: #555;
+      transition: color 0.2s;
+    }
+
+    .pay-row.highlight {
+      color: #ffdd00;
+      text-shadow: 0 0 8px rgba(255, 221, 0, 0.5);
+    }
+
+    .pay-row .pay-mult {
+      color: #2a8a4a;
+      font-weight: bold;
+      min-width: 28px;
+      text-align: right;
+    }
+
+    .pay-row.highlight .pay-mult {
+      color: #ffdd00;
+    }
+
+    /* Cards area */
+    #cards-area {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      padding: 4px 0;
+    }
+
+    .card-slot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .hold-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: #00ff88;
+      font-weight: bold;
+      height: 13px;
+      line-height: 13px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .hold-label.visible {
+      opacity: 1;
+    }
+
+    /* Card */
+    .card {
+      width: 68px;
+      height: 96px;
+      background: #f0ede0;
+      border-radius: 6px;
+      border: 2px solid #555;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.2s, box-shadow 0.2s;
+      flex-shrink: 0;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    .card.held {
+      border-color: #00ff88;
+      box-shadow: 0 0 14px #00ff88, 0 0 30px rgba(0, 255, 136, 0.35);
+      transform: translateY(-8px);
+    }
+
+    .card.red  { color: #cc1111; }
+    .card.black { color: #111111; }
+
+    .card .corner {
+      position: absolute;
+      font-weight: bold;
+      line-height: 1;
+      font-size: 13px;
+    }
+
+    .card .corner small {
+      font-size: 10px;
+      display: block;
+      line-height: 1;
+    }
+
+    .card .corner-tl { top: 4px; left: 5px; }
+
+    .card .corner-br {
+      bottom: 4px;
+      right: 5px;
+      transform: rotate(180deg);
+    }
+
+    .card .suit-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    /* Card back */
+    .card.face-down {
+      background: #1a3a8a;
+      border-color: #0f2060;
+      background-image:
+        repeating-linear-gradient(45deg,  rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 1px, transparent 0, transparent 50%),
+        repeating-linear-gradient(-45deg, rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 1px, transparent 0, transparent 50%);
+      background-size: 12px 12px;
+      cursor: default;
+    }
+
+    /* Deal animation */
+    @keyframes card-deal {
+      from { opacity: 0; transform: scale(0.82) translateY(-14px); }
+      to   { opacity: 1; transform: scale(1)    translateY(0); }
+    }
+
+    .card.dealing {
+      animation: card-deal 0.18s ease-out both;
+    }
+
+    .card.held.dealing {
+      animation: card-deal 0.18s ease-out both;
+      /* JS re-applies transform:translateY(-8px) via class */
+    }
+
+    /* Info bar */
+    #info-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      min-height: 40px;
+      justify-content: center;
+    }
+
+    #hand-name {
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: #00ff88;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+
+    #win-display {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #ffdd00;
+      text-shadow: 0 0 8px rgba(255, 221, 0, 0.4);
+    }
+
+    /* Deal button */
+    #btn-deal {
+      font-size: 16px;
+      letter-spacing: 4px;
+      padding: 12px 40px;
+    }
+
+    #btn-deal:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+
+    <!-- HUD ────────────────────────────────────────────────── -->
+    <div id="hud">
+      <div class="hud-item">
+        <span class="hud-label">CHIPS</span>
+        <span id="chips-display" class="hud-value">--</span>
+      </div>
+      <button id="btn-mute" class="btn-icon" title="Mute">🔊</button>
+      <div class="hud-item" style="align-items:flex-end">
+        <span class="hud-label">BEST</span>
+        <span id="best-display" class="hud-value">0</span>
+      </div>
+    </div>
+
+    <!-- Pay table ───────────────────────────────────────────── -->
+    <div id="pay-table">
+      <div class="pay-row" id="pr-royal">
+        <span class="pay-name">ROYAL FLUSH</span><span class="pay-mult">800</span>
+      </div>
+      <div class="pay-row" id="pr-sf">
+        <span class="pay-name">STRAIGHT FLUSH</span><span class="pay-mult">50</span>
+      </div>
+      <div class="pay-row" id="pr-4k">
+        <span class="pay-name">FOUR OF A KIND</span><span class="pay-mult">25</span>
+      </div>
+      <div class="pay-row" id="pr-fh">
+        <span class="pay-name">FULL HOUSE</span><span class="pay-mult">9</span>
+      </div>
+      <div class="pay-row" id="pr-fl">
+        <span class="pay-name">FLUSH</span><span class="pay-mult">6</span>
+      </div>
+      <div class="pay-row" id="pr-st">
+        <span class="pay-name">STRAIGHT</span><span class="pay-mult">4</span>
+      </div>
+      <div class="pay-row" id="pr-3k">
+        <span class="pay-name">THREE OF A KIND</span><span class="pay-mult">3</span>
+      </div>
+      <div class="pay-row" id="pr-2p">
+        <span class="pay-name">TWO PAIR</span><span class="pay-mult">2</span>
+      </div>
+      <div class="pay-row" id="pr-jb">
+        <span class="pay-name">JACKS OR BETTER</span><span class="pay-mult">1</span>
+      </div>
+    </div>
+
+    <!-- Cards ──────────────────────────────────────────────── -->
+    <div id="cards-area">
+      <!-- populated by videopoker.js -->
+    </div>
+
+    <!-- Hand result ─────────────────────────────────────────── -->
+    <div id="info-bar">
+      <div id="hand-name">&nbsp;</div>
+      <div id="win-display">&nbsp;</div>
+    </div>
+
+    <!-- Deal / Draw button ───────────────────────────────────── -->
+    <button id="btn-deal" class="btn-primary">DEAL</button>
+
+    <!-- Overlays ────────────────────────────────────────────── -->
+    <div id="overlay-start" class="overlay">
+      <h1 class="game-title">POKER</h1>
+      <p class="overlay-hint">Tap cards to hold · Jacks or Better pays</p>
+      <button id="btn-start" class="btn-primary">DEAL CARDS</button>
+    </div>
+
+    <div id="overlay-over" class="overlay hidden">
+      <h2>GAME OVER</h2>
+      <div class="overlay-scores">
+        <div class="overlay-score-row">
+          <span class="label">CHIPS</span>
+          <span id="final-chips" class="value">0</span>
+        </div>
+        <div class="overlay-score-row">
+          <span class="label">BEST</span>
+          <span id="final-best" class="value">0</span>
+        </div>
+      </div>
+      <button id="btn-restart" class="btn-primary">PLAY AGAIN</button>
+    </div>
+
+  </div><!-- #game-container -->
+
+  <!-- Common libraries -->
+  <script src="../common/save.js"></script>
+  <script src="../common/towerlife.js"></script>
+  <script src="../common/audio.js"></script>
+  <script src="../common/achievements.js"></script>
+  <script src="../common/ui.js"></script>
+  <!-- Game -->
+  <script src="videopoker.js"></script>
+</body>
+</html>

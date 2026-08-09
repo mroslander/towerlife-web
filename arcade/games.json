@@ -59,6 +59,25 @@
             "playPrice": 1,
             "starsRequired": 0,
             "initialFreePlays": 3
+        },
+        {
+            "id": "videopoker",
+            "name": "Video Poker",
+            "description": "Jacks or Better. Hold your cards, beat the house.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/videopoker/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/videopoker/screenshot.png",
+            "purchasePrice": 150,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "achievements": [
+                { "id": "vp_royal_flush",    "name": "Royal Flush!",     "description": "Hit a Royal Flush." },
+                { "id": "vp_straight_flush", "name": "Straight Flush!",  "description": "Hit a Straight Flush." },
+                { "id": "vp_four_of_a_kind", "name": "Four of a Kind!",  "description": "Hit Four of a Kind." },
+                { "id": "vp_chips_50",       "name": "50 Chips!",        "description": "Reach 50 chips in one session." },
+                { "id": "vp_chips_100",      "name": "100 Chips!",       "description": "Reach 100 chips in one session." },
+                { "id": "vp_new_best",       "name": "New Best!",        "description": "Beat your previous best chip count." }
+            ]
         }
     ]
 }
