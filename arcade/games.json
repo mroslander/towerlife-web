@@ -61,6 +61,25 @@
             "initialFreePlays": 3
         },
         {
+            "id": "blockmaster",
+            "name": "Blockmaster",
+            "description": "Drag blocks onto the grid. Fill rows and columns to clear them.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/blockmaster/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/blockmaster/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "bm_500",  "name": "500 Points!",      "description": "Score 500 points in Blockmaster." },
+                { "id": "bm_2k",   "name": "2 000 Points!",    "description": "Score 2 000 points in Blockmaster." },
+                { "id": "bm_5k",   "name": "5 000 Points!",    "description": "Score 5 000 points in Blockmaster." },
+                { "id": "bm_10l",  "name": "10 Lines Cleared!", "description": "Clear 10 rows/columns in one game." },
+                { "id": "bm_30l",  "name": "30 Lines Cleared!", "description": "Clear 30 rows/columns in one game." }
+            ]
+        },
+        {
             "id": "videopoker",
             "name": "Video Poker",
             "description": "Jacks or Better. Hold your cards, beat the house.",
@@ -105,6 +124,27 @@
                 { "id": "fruits_bar",    "name": "BAR Jackpot!", "description": "Hit BAR×3 on any pay line." },
                 { "id": "fruits_seven",  "name": "Lucky Sevens!", "description": "Hit 7×3 on any pay line." },
                 { "id": "fruits_bigwin", "name": "Big Win!",     "description": "Win 50+ chips in a single spin." }
+            ]
+        }
+        ,{
+            "id": "area51",
+            "name": "Area 51%",
+            "description": "Claim territory. Avoid the bouncing balls. Fill 75% to advance.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/area51/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/area51/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "a51_50pct",  "name": "50% Claimed!",  "description": "Claim 50% of the field in one game." },
+                { "id": "a51_75pct",  "name": "75% Claimed!",  "description": "Claim 75% of the field in one game." },
+                { "id": "a51_90pct",  "name": "90% Claimed!",  "description": "Claim 90% of the field in one game." },
+                { "id": "a51_1k",     "name": "1000 Points!",  "description": "Score 1000 points in Area 51%." },
+                { "id": "a51_5k",     "name": "5000 Points!",  "description": "Score 5000 points in Area 51%." },
+                { "id": "a51_lvl3",   "name": "Level 3!",      "description": "Reach level 3 in Area 51%." },
+                { "id": "a51_lvl5",   "name": "Level 5!",      "description": "Reach level 5 in Area 51%." }
             ]
         }
     ]

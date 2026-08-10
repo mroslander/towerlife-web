@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Area 51% — TowerLife Arcade</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    #game-container {
+      gap: 4px;
+      padding: 6px 4px;
+    }
+
+    /* Sub-HUD row: level · lives · area% */
+    #hud-sub {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 420px;
+      padding: 0 10px;
+    }
+
+    .hud-sub-item {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: #555;
+    }
+
+    .hud-sub-val {
+      color: #00ffcc;
+      font-weight: bold;
+    }
+
+    /* Virtual joystick */
+    #joystick-zone {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      height: 120px;
+      width: 100%;
+    }
+
+    #joystick-base {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(0, 255, 204, 0.04);
+      border: 2px solid rgba(0, 255, 204, 0.15);
+      position: relative;
+      cursor: pointer;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #joystick-knob {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: rgba(0, 255, 204, 0.25);
+      border: 2px solid rgba(0, 255, 204, 0.6);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+    }
+
+    /* Level-up banner */
+    #level-banner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      background: rgba(0, 0, 0, 0.9);
+      color: #00ffcc;
+      font-size: 26px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      padding: 14px 28px;
+      border: 2px solid #00ffcc;
+      border-radius: 6px;
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      text-shadow: 0 0 12px #00ffcc;
+      box-shadow: 0 0 20px rgba(0,255,204,0.3);
+    }
+
+    #level-banner.show {
+      animation: bannerPop 1.4s ease forwards;
+    }
+
+    @keyframes bannerPop {
+      0%   { transform: translate(-50%,-50%) scale(0.5); opacity: 0; }
+      20%  { transform: translate(-50%,-50%) scale(1.08); opacity: 1; }
+      60%  { transform: translate(-50%,-50%) scale(1.0);  opacity: 1; }
+      100% { transform: translate(-50%,-50%) scale(1.0);  opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+
+    <!-- Main HUD -->
+    <div id="hud">
+      <div class="hud-item">
+        <span class="hud-label">SCORE</span>
+        <span id="score" class="hud-value">0</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button id="btn-mute"  class="btn-icon" title="Mute">🔊</button>
+        <button id="btn-pause" class="btn-icon" title="Pause" disabled>⏸</button>
+      </div>
+      <div class="hud-item" style="align-items:flex-end;">
+        <span class="hud-label">BEST</span>
+        <span id="high-score" class="hud-value">0</span>
+      </div>
+    </div>
+
+    <!-- Sub HUD: level · lives · area% -->
+    <div id="hud-sub">
+      <div class="hud-sub-item">
+        LVL&nbsp;<span id="level-val" class="hud-sub-val">1</span>
+      </div>
+      <div class="hud-sub-item" id="lives-val">♥♥♥</div>
+      <div class="hud-sub-item">
+        <span id="pct-val" class="hud-sub-val">0%</span>
+        &nbsp;/&nbsp;<span id="target-val" class="hud-sub-val">75%</span>
+      </div>
+    </div>
+
+    <!-- Canvas + overlays -->
+    <div id="canvas-wrapper">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Start -->
+      <div id="overlay-start" class="overlay">
+        <h1 class="game-title" style="font-size:38px;letter-spacing:6px;color:#00ffcc;text-shadow:0 0 12px #00ffcc,0 0 32px rgba(0,255,204,0.4);">AREA 51%</h1>
+        <p class="overlay-hint">Claim territory · avoid the balls</p>
+        <button id="btn-start" class="btn-primary">START</button>
+        <p class="overlay-sub">Use joystick · arrow keys · WASD</p>
+      </div>
+
+      <!-- Paused -->
+      <div id="overlay-pause" class="overlay hidden">
+        <h2>PAUSED</h2>
+        <button id="btn-resume" class="btn-primary">RESUME</button>
+        <p class="overlay-sub">P · Esc to continue</p>
+      </div>
+
+      <!-- Game Over -->
+      <div id="overlay-over" class="overlay hidden">
+        <h2>GAME OVER</h2>
+        <div class="overlay-scores">
+          <div class="overlay-score-row">
+            <span class="label">SCORE</span>
+            <span id="final-score" class="value">0</span>
+          </div>
+          <div class="overlay-score-row">
+            <span class="label">BEST</span>
+            <span id="final-high" class="value">0</span>
+          </div>
+        </div>
+        <button id="btn-restart" class="btn-primary">PLAY AGAIN</button>
+        <p class="overlay-sub">Enter · Space · or tap</p>
+      </div>
+
+      <!-- Level-up banner (inside canvas-wrapper so it overlays the canvas) -->
+      <div id="level-banner">LEVEL 2!</div>
+
+    </div><!-- #canvas-wrapper -->
+
+    <!-- Virtual joystick -->
+    <div id="joystick-zone">
+      <div id="joystick-base">
+        <div id="joystick-knob"></div>
+      </div>
+    </div>
+
+  </div><!-- #game-container -->
+
+  <script src="../common/save.js"></script>
+  <script src="../common/towerlife.js"></script>
+  <script src="../common/audio.js"></script>
+  <script src="../common/achievements.js"></script>
+  <script src="../common/ui.js"></script>
+  <script src="area51.js"></script>
+</body>
+</html>
