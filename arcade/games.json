@@ -80,6 +80,18 @@
             ]
         },
         {
+            "id": "jumper",
+            "name": "Jumper",
+            "description": "Jump higher and higher. Don't fall.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/jumper/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/jumper/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing"
+        },
+        {
             "id": "fruits",
             "name": "Fruits",
             "description": "3-reel slots. 5 pay lines. Double or nothing.",
