@@ -78,6 +78,22 @@
                 { "id": "vp_chips_100",      "name": "100 Chips!",       "description": "Reach 100 chips in one session." },
                 { "id": "vp_new_best",       "name": "New Best!",        "description": "Beat your previous best chip count." }
             ]
+        },
+        {
+            "id": "fruits",
+            "name": "Fruits",
+            "description": "3-reel slots. 5 pay lines. Double or nothing.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/fruits/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/fruits/screenshot.png",
+            "purchasePrice": 150,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "achievements": [
+                { "id": "fruits_bar",    "name": "BAR Jackpot!", "description": "Hit BAR×3 on any pay line." },
+                { "id": "fruits_seven",  "name": "Lucky Sevens!", "description": "Hit 7×3 on any pay line." },
+                { "id": "fruits_bigwin", "name": "Big Win!",     "description": "Win 50+ chips in a single spin." }
+            ]
         }
     ]
 }

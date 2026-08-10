@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Fruits — TowerLife Casino</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    /* ── Fruits Slots specific ────────────────────────────────── */
+
+    #game-container {
+      gap: 6px;
+      padding: 6px 8px;
+    }
+
+    /* Pay table ──────────────────────────────────────────────── */
+    #pay-table {
+      width: 100%;
+      max-width: 380px;
+      background: rgba(30, 15, 0, 0.4);
+      border: 1px solid #3a2800;
+      border-radius: 4px;
+      padding: 5px 10px;
+    }
+
+    #pay-table-body {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px 4px;
+    }
+
+    .pt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2px 0;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: #555;
+      transition: color 0.2s;
+    }
+
+    .pt-row.highlight {
+      color: #ffdd00;
+      text-shadow: 0 0 8px rgba(255, 221, 0, 0.5);
+    }
+
+    .pt-sym {
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    .pt-pay {
+      color: #885500;
+      font-weight: bold;
+      min-width: 24px;
+      text-align: right;
+    }
+
+    .pt-row.highlight .pt-pay {
+      color: #ffdd00;
+    }
+
+    /* Reel machine ───────────────────────────────────────────── */
+    #reel-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    #reel-area {
+      display: flex;
+      gap: 5px;
+      background: #0c0c0c;
+      border: 3px solid #443300;
+      border-radius: 8px;
+      padding: 8px;
+      box-shadow:
+        0 0 20px rgba(255, 180, 0, 0.15),
+        inset 0 0 14px rgba(0, 0, 0, 0.9);
+      position: relative;
+    }
+
+    /* Center-line highlight stripe */
+    #reel-area::after {
+      content: '';
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 50%;
+      height: 74px;
+      transform: translateY(-50%);
+      border-top: 1px solid rgba(255, 221, 0, 0.18);
+      border-bottom: 1px solid rgba(255, 221, 0, 0.18);
+      pointer-events: none;
+    }
+
+    .reel {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .reel-cell {
+      width: 72px;
+      height: 72px;
+      background: #111;
+      border: 1.5px solid #2a2a2a;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      line-height: 1;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Special symbol styles */
+    .reel-cell[data-sym="seven"] {
+      font-size: 42px;
+      font-weight: bold;
+      color: #ff3333;
+      text-shadow: 0 0 10px rgba(255, 51, 51, 0.7);
+    }
+
+    .reel-cell[data-sym="bar"] {
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #fff;
+      text-shadow: 0 0 8px #ffcc00, 0 0 16px rgba(255, 204, 0, 0.5);
+      background: linear-gradient(135deg, #1a1200, #221a00);
+    }
+
+    .reel-cell.spinning {
+      filter: blur(1.5px);
+      opacity: 0.8;
+    }
+
+    .reel-cell.stopped {
+      border-color: #3a2800;
+    }
+
+    /* Gold win glow (horizontal lines) */
+    .reel-cell.win-h {
+      border-color: #ffdd00;
+      box-shadow: 0 0 10px #ffdd00, 0 0 22px rgba(255, 221, 0, 0.45);
+      animation: cell-win-pulse 0.55s ease-in-out infinite alternate;
+    }
+
+    /* Cyan win glow (diagonal lines) */
+    .reel-cell.win-d {
+      border-color: #00ddff;
+      box-shadow: 0 0 10px #00ddff, 0 0 22px rgba(0, 221, 255, 0.45);
+      animation: cell-win-pulse-d 0.55s ease-in-out infinite alternate;
+    }
+
+    /* Both horizontal and diagonal — gold takes priority */
+    .reel-cell.win-h.win-d {
+      border-color: #ffdd00;
+      box-shadow: 0 0 10px #ffdd00, 0 0 22px rgba(255, 221, 0, 0.45);
+      animation: cell-win-pulse 0.55s ease-in-out infinite alternate;
+    }
+
+    @keyframes cell-win-pulse {
+      from { box-shadow: 0 0 8px #ffdd00, 0 0 16px rgba(255, 221, 0, 0.3); }
+      to   { box-shadow: 0 0 16px #ffdd00, 0 0 34px rgba(255, 221, 0, 0.65); }
+    }
+
+    @keyframes cell-win-pulse-d {
+      from { box-shadow: 0 0 8px #00ddff, 0 0 16px rgba(0, 221, 255, 0.3); }
+      to   { box-shadow: 0 0 16px #00ddff, 0 0 34px rgba(0, 221, 255, 0.65); }
+    }
+
+    /* Reel stop bounce */
+    @keyframes reel-stop-bounce {
+      0%   { transform: translateY(0); }
+      35%  { transform: translateY(5px); }
+      65%  { transform: translateY(-2px); }
+      100% { transform: translateY(0); }
+    }
+
+    .reel.bouncing {
+      animation: reel-stop-bounce 0.22s ease-out both;
+    }
+
+    /* Win-line side indicators ────────────────────────────────── */
+    .wl-side {
+      position: relative;
+      width: 12px;
+      /* height matches reel-area outer: 3+8+72+4+72+4+72+8+3 = 246px */
+      height: 246px;
+      flex-shrink: 0;
+    }
+
+    .wl-dot {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      left: 1px;
+      border-radius: 50%;
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    /* Vertical positions: row centers at 3+8+36=47, 47+76=123, 123+76=199 from top */
+    .wl-dot.l-top  { top:  42px; } /* 47 - 5 */
+    .wl-dot.l-mid  { top: 118px; } /* 123 - 5 */
+    .wl-dot.l-bot  { top: 194px; } /* 199 - 5 */
+
+    .wl-dot.r-top  { top:  42px; }
+    .wl-dot.r-mid  { top: 118px; }
+    .wl-dot.r-bot  { top: 194px; }
+
+    /* Line colors */
+    .wl-dot.l-top,  .wl-dot.r-top  { --lc: #ff5555; }
+    .wl-dot.l-mid,  .wl-dot.r-mid  { --lc: #ffdd00; }
+    .wl-dot.l-bot,  .wl-dot.r-bot  { --lc: #55aaff; }
+
+    .wl-dot.active {
+      background: var(--lc);
+      box-shadow: 0 0 6px var(--lc), 0 0 12px var(--lc);
+    }
+
+    /* Win / info display ─────────────────────────────────────── */
+    #win-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      min-height: 34px;
+      justify-content: center;
+    }
+
+    #win-label {
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: #ffdd00;
+      text-shadow: 0 0 10px rgba(255, 221, 0, 0.5);
+      text-transform: uppercase;
+    }
+
+    #win-chips {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #00ff88;
+      text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+    }
+
+    /* Spin button */
+    #btn-spin {
+      font-size: 16px;
+      letter-spacing: 4px;
+      padding: 12px 40px;
+    }
+
+    #btn-spin:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    /* Double-or-nothing overlay ──────────────────────────────── */
+    #game-container { position: relative; }
+
+    #overlay-double .dbl-label {
+      font-size: 15px;
+      letter-spacing: 4px;
+      color: #ffdd00;
+      text-shadow: 0 0 10px rgba(255, 221, 0, 0.45);
+    }
+
+    #overlay-double .dbl-stake {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #555;
+    }
+
+    #overlay-double .dbl-stake #dbl-amount {
+      color: #ffdd00;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    #dbl-result {
+      font-size: 13px;
+      letter-spacing: 2px;
+      min-height: 20px;
+      text-align: center;
+    }
+
+    #dbl-result.win  { color: #00ff88; text-shadow: 0 0 8px rgba(0, 255, 136, 0.5); }
+    #dbl-result.lose { color: #ff4444; text-shadow: 0 0 8px rgba(255, 68, 68, 0.5); }
+    #dbl-result.push { color: #ffdd00; text-shadow: 0 0 8px rgba(255, 221, 0, 0.5); }
+
+    #dbl-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    #btn-dbl-low, #btn-dbl-high {
+      font-size: 13px;
+      padding: 10px 18px;
+      letter-spacing: 2px;
+    }
+
+    #btn-dbl-collect {
+      font-size: 11px;
+      padding: 8px 14px;
+      letter-spacing: 2px;
+      border-color: #888;
+      color: #888;
+    }
+
+    #btn-dbl-collect:hover { border-color: #aaa; color: #aaa; }
+
+    #btn-dbl-low:disabled,
+    #btn-dbl-high:disabled,
+    #btn-dbl-collect:disabled { opacity: 0.3; pointer-events: none; }
+
+    .dbl-hint {
+      font-size: 10px;
+      color: #333;
+      letter-spacing: 1px;
+    }
+
+    /* Card styles (for double-or-nothing card reveal) */
+    .card {
+      width: 68px;
+      height: 96px;
+      background: #f0ede0;
+      border-radius: 6px;
+      border: 2px solid #555;
+      position: relative;
+      cursor: default;
+      flex-shrink: 0;
+      overflow: hidden;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    .card.red   { color: #cc1111; }
+    .card.black { color: #111111; }
+
+    .card .corner {
+      position: absolute;
+      font-weight: bold;
+      line-height: 1;
+      font-size: 13px;
+    }
+
+    .card .corner small {
+      font-size: 10px;
+      display: block;
+      line-height: 1;
+    }
+
+    .card .corner-tl { top: 4px; left: 5px; }
+
+    .card .corner-br {
+      bottom: 4px;
+      right: 5px;
+      transform: rotate(180deg);
+    }
+
+    .card .suit-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .card.face-down {
+      background: #1a3a8a;
+      border-color: #0f2060;
+      background-image:
+        repeating-linear-gradient(45deg,  rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 1px, transparent 0, transparent 50%),
+        repeating-linear-gradient(-45deg, rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 1px, transparent 0, transparent 50%);
+      background-size: 12px 12px;
+    }
+
+    @keyframes card-deal {
+      from { opacity: 0; transform: scale(0.82) translateY(-14px); }
+      to   { opacity: 1; transform: scale(1)    translateY(0); }
+    }
+
+    .card.dealing {
+      animation: card-deal 0.18s ease-out both;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+
+    <!-- HUD ─────────────────────────────────────────────────── -->
+    <div id="hud">
+      <div class="hud-item">
+        <span class="hud-label">CHIPS</span>
+        <span id="chips-display" class="hud-value">--</span>
+      </div>
+      <button id="btn-mute" class="btn-icon" title="Mute">🔊</button>
+      <div class="hud-item" style="align-items:flex-end">
+        <span class="hud-label">BEST</span>
+        <span id="best-display" class="hud-value">0</span>
+      </div>
+    </div>
+
+    <!-- Pay table ────────────────────────────────────────────── -->
+    <div id="pay-table">
+      <div id="pay-table-body">
+        <!-- populated by fruits.js -->
+      </div>
+    </div>
+
+    <!-- Reel machine ─────────────────────────────────────────── -->
+    <div id="reel-wrapper">
+
+      <!-- Left win-line indicators (top / mid / bot rows) -->
+      <div class="wl-side" id="wl-left">
+        <div class="wl-dot l-top" id="wl-l-top"></div>
+        <div class="wl-dot l-mid" id="wl-l-mid"></div>
+        <div class="wl-dot l-bot" id="wl-l-bot"></div>
+      </div>
+
+      <!-- Reels (3 columns × 3 rows, built by JS) -->
+      <div id="reel-area"></div>
+
+      <!-- Right win-line indicators -->
+      <div class="wl-side" id="wl-right">
+        <div class="wl-dot r-top" id="wl-r-top"></div>
+        <div class="wl-dot r-mid" id="wl-r-mid"></div>
+        <div class="wl-dot r-bot" id="wl-r-bot"></div>
+      </div>
+
+    </div>
+
+    <!-- Win / result display ─────────────────────────────────── -->
+    <div id="win-display">
+      <div id="win-label">&nbsp;</div>
+      <div id="win-chips">&nbsp;</div>
+    </div>
+
+    <!-- Spin button ──────────────────────────────────────────── -->
+    <button id="btn-spin" class="btn-primary">SPIN</button>
+
+    <!-- ── Overlays ──────────────────────────────────────────── -->
+
+    <div id="overlay-start" class="overlay">
+      <h1 class="game-title">FRUITS</h1>
+      <p class="overlay-hint">3 reels · 5 lines · double or nothing</p>
+      <button id="btn-start" class="btn-primary">PLAY</button>
+    </div>
+
+    <div id="overlay-over" class="overlay hidden">
+      <h2>GAME OVER</h2>
+      <div class="overlay-scores">
+        <div class="overlay-score-row">
+          <span class="label">CHIPS</span>
+          <span id="final-chips" class="value">0</span>
+        </div>
+        <div class="overlay-score-row">
+          <span class="label">BEST</span>
+          <span id="final-best" class="value">0</span>
+        </div>
+      </div>
+      <button id="btn-restart" class="btn-primary">PLAY AGAIN</button>
+    </div>
+
+    <div id="overlay-double" class="overlay hidden">
+      <div class="dbl-label">DOUBLE OR NOTHING?</div>
+      <div class="dbl-stake">AT STAKE: <span id="dbl-amount">0</span> CHIPS</div>
+      <div id="dbl-card" class="card face-down"></div>
+      <div id="dbl-result"></div>
+      <div id="dbl-buttons">
+        <button id="btn-dbl-low"     class="btn-primary">◄ LOW</button>
+        <button id="btn-dbl-collect" class="btn-primary">COLLECT</button>
+        <button id="btn-dbl-high"    class="btn-primary">HIGH ►</button>
+      </div>
+      <div class="dbl-hint">A–6 = LOW &nbsp;·&nbsp; 7 = COLLECT &nbsp;·&nbsp; 8–K = HIGH</div>
+    </div>
+
+  </div><!-- #game-container -->
+
+  <!-- Common libraries -->
+  <script src="../common/save.js"></script>
+  <script src="../common/towerlife.js"></script>
+  <script src="../common/audio.js"></script>
+  <script src="../common/achievements.js"></script>
+  <script src="../common/ui.js"></script>
+  <!-- Game -->
+  <script src="fruits.js"></script>
+</body>
+</html>
