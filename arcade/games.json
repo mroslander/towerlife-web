@@ -146,6 +146,24 @@
                 { "id": "a51_lvl3",   "name": "Level 3!",      "description": "Reach level 3 in Area 51%." },
                 { "id": "a51_lvl5",   "name": "Level 5!",      "description": "Reach level 5 in Area 51%." }
             ]
+        },
+        {
+            "id": "stacker",
+            "name": "Stacker",
+            "description": "Tap to drop blocks. Stack as high as you can.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/stacker/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/stacker/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "stacker_10",  "name": "10 High!",     "description": "Stack 10 blocks in one game." },
+                { "id": "stacker_25",  "name": "25 High!",     "description": "Stack 25 blocks in one game." },
+                { "id": "stacker_50",  "name": "50 High!",     "description": "Stack 50 blocks in one game." },
+                { "id": "stacker_perfect3", "name": "Perfect Trio!", "description": "Land 3 perfect drops in a row." }
+            ]
         }
     ]
 }

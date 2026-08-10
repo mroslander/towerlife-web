@@ -1,6 +1,8 @@
 {
     "chat.tools.terminal.autoApprove": {
+        "**": true,
         "cd": true,
+        "node": true,
         "echo": true,
         "ls": true,
         "dir": true,
