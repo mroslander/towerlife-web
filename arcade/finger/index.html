@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Finger — TowerLife Arcade</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    #hud { max-width: 360px; }
+
+    #over-reason {
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: #ff2255;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-container">
+
+    <!-- HUD ─────────────────────────────────────────────────── -->
+    <div id="hud">
+      <div class="hud-item">
+        <span class="hud-label">TIME</span>
+        <span id="score" class="hud-value">0.0s</span>
+      </div>
+
+      <div>
+        <button id="btn-mute" class="btn-icon" title="Mute">🔊</button>
+      </div>
+
+      <div class="hud-item" style="align-items:flex-end;">
+        <span class="hud-label">BEST</span>
+        <span id="high-score" class="hud-value">0.0s</span>
+      </div>
+    </div>
+
+    <!-- Canvas + overlays ───────────────────────────────────── -->
+    <div id="canvas-wrapper">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Start screen -->
+      <div id="overlay-start" class="overlay">
+        <h1 class="game-title">FINGER</h1>
+        <p class="overlay-hint" style="text-align:center;line-height:1.7;">
+          Hold &amp; drag your finger to steer.<br>Dodge the incoming obstacles!<br>
+          <span style="color:#ff2255;">Lifting your finger = game over!</span>
+        </p>
+        <button id="btn-start" class="btn-primary">START</button>
+        <p class="overlay-sub">Score = time survived</p>
+      </div>
+
+      <!-- Game over screen -->
+      <div id="overlay-over" class="overlay hidden">
+        <h2>GAME OVER</h2>
+        <p id="over-reason">BLADE HIT!</p>
+        <div class="overlay-scores">
+          <div class="overlay-score-row">
+            <span class="label">TIME</span>
+            <span id="final-score" class="value">0.0s</span>
+          </div>
+          <div class="overlay-score-row">
+            <span class="label">BEST</span>
+            <span id="final-high" class="value">0.0s</span>
+          </div>
+        </div>
+        <button id="btn-restart" class="btn-primary">PLAY AGAIN</button>
+        <p class="overlay-sub">Touch and hold canvas to begin</p>
+      </div>
+    </div>
+
+  </div><!-- #game-container -->
+
+  <!-- Common libraries -->
+  <script src="../common/save.js"></script>
+  <script src="../common/towerlife.js"></script>
+  <script src="../common/audio.js"></script>
+  <script src="../common/achievements.js"></script>
+  <script src="../common/ui.js"></script>
+  <!-- Game -->
+  <script src="finger.js"></script>
+</body>
+</html>

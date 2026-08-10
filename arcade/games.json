@@ -164,6 +164,23 @@
                 { "id": "stacker_50",  "name": "50 High!",     "description": "Stack 50 blocks in one game." },
                 { "id": "stacker_perfect3", "name": "Perfect Trio!", "description": "Land 3 perfect drops in a row." }
             ]
+        },
+        {
+            "id": "finger",
+            "name": "Finger",
+            "description": "Hold your finger on screen. Dodge the spinning blades. Don't let go.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/finger/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/finger/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "finger_10s",  "name": "10 Seconds!",  "description": "Survive 10 seconds in Finger." },
+                { "id": "finger_30s",  "name": "30 Seconds!",  "description": "Survive 30 seconds in Finger." },
+                { "id": "finger_60s",  "name": "One Minute!",  "description": "Survive 60 seconds in Finger." }
+            ]
         }
     ]
 }
