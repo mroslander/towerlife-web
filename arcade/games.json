@@ -166,6 +166,24 @@
             ]
         },
         {
+            "id": "froggy",
+            "name": "Froggy",
+            "description": "Hop across traffic and rivers. Don't get squished or wet.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/froggy/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/froggy/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "froggy_10",  "name": "10 Hops!",   "description": "Reach a score of 10 in Froggy." },
+                { "id": "froggy_25",  "name": "25 Hops!",   "description": "Reach a score of 25 in Froggy." },
+                { "id": "froggy_50",  "name": "50 Hops!",   "description": "Reach a score of 50 in Froggy." },
+                { "id": "froggy_100", "name": "Century Hop!", "description": "Reach a score of 100 in Froggy." }
+            ]
+        },
+        {
             "id": "finger",
             "name": "Finger",
             "description": "Hold your finger on screen. Dodge the spinning blades. Don't let go.",

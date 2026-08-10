@@ -3,6 +3,7 @@
         "**": true,
         "cd": true,
         "node": true,
+        "python3": true,
         "echo": true,
         "ls": true,
         "dir": true,
