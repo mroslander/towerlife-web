@@ -108,8 +108,11 @@
     canvas = document.getElementById('game-canvas');
     ctx    = canvas.getContext('2d');
     function resize() {
-      const wrap  = canvas.parentElement;
-      const scale = Math.min(wrap.clientWidth / W, wrap.clientHeight / H);
+      const hudEl  = document.getElementById('hud');
+      const hudH   = hudEl ? hudEl.offsetHeight + 4 : 44;
+      const availW = window.innerWidth;
+      const availH = window.innerHeight - hudH;
+      const scale  = Math.min(availW / W, availH / H);
       canvas.width  = W;
       canvas.height = H;
       canvas.style.width  = Math.round(W * scale) + 'px';

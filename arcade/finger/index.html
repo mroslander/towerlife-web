@@ -6,7 +6,29 @@
   <title>Finger — TowerLife Arcade</title>
   <link rel="stylesheet" href="../css/style.css" />
   <style>
-    #hud { max-width: 360px; }
+    /* Fill the full viewport — no wasted side space */
+    #game-container {
+      padding: 0;
+      gap: 0;
+    }
+
+    #hud {
+      max-width: none;
+      width: 100%;
+      padding: 5px 14px;
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    #canvas-wrapper {
+      width: 100%;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      box-shadow: none;
+      background: #060612;
+    }
 
     #over-reason {
       font-size: 13px;
