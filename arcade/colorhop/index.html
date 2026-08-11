@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Color Hop — TowerLife Arcade</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    #canvas-wrapper {
+      border: none;
+      box-shadow: none;
+      background: #0a0a14;
+    }
+
+    #color-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: background-color 0.1s, box-shadow 0.1s;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-container">
+
+    <!-- HUD ──────────────────────────────────────────────────────── -->
+    <div id="hud">
+      <div class="hud-item">
+        <span class="hud-label">SCORE</span>
+        <div style="display:flex;align-items:center;gap:7px;">
+          <span id="score" class="hud-value">0</span>
+          <span id="color-dot"></span>
+        </div>
+      </div>
+
+      <div>
+        <button id="btn-mute" class="btn-icon" title="Mute">🔊</button>
+      </div>
+
+      <div class="hud-item" style="align-items:flex-end;">
+        <span class="hud-label">BEST</span>
+        <span id="high-score" class="hud-value">0</span>
+      </div>
+    </div>
+
+    <!-- Canvas + overlays ───────────────────────────────────────── -->
+    <div id="canvas-wrapper">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Start screen -->
+      <div id="overlay-start" class="overlay">
+        <h1 class="game-title">COLOR HOP</h1>
+        <p class="overlay-hint" style="text-align:center;line-height:1.85;">
+          <strong>Tap</strong> to bounce the ball upward.<br>
+          Pass through the <strong>matching color</strong> segment.<br>
+          <span style="color:#ff2255;">Hit the wrong color — game over!</span>
+        </p>
+        <button id="btn-start" class="btn-primary">START</button>
+        <p class="overlay-sub">After START, tap when the right color is at the bottom</p>
+      </div>
+
+      <!-- Game over screen -->
+      <div id="overlay-over" class="overlay hidden">
+        <h2>GAME OVER</h2>
+        <div class="overlay-scores">
+          <div class="overlay-score-row">
+            <span class="label">SCORE</span>
+            <span id="final-score" class="value">0</span>
+          </div>
+          <div class="overlay-score-row">
+            <span class="label">BEST</span>
+            <span id="final-high" class="value">0</span>
+          </div>
+        </div>
+        <button id="btn-restart" class="btn-primary">PLAY AGAIN</button>
+        <p class="overlay-sub">Tap · Space · Enter</p>
+      </div>
+    </div>
+
+  </div><!-- #game-container -->
+
+  <!-- Common libraries -->
+  <script src="../common/save.js"></script>
+  <script src="../common/towerlife.js"></script>
+  <script src="../common/audio.js"></script>
+  <script src="../common/achievements.js"></script>
+  <script src="../common/ui.js"></script>
+  <!-- Game -->
+  <script src="colorhop.js"></script>
+</body>
+</html>

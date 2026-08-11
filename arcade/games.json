@@ -199,6 +199,24 @@
                 { "id": "finger_30s",  "name": "30 Seconds!",  "description": "Survive 30 seconds in Finger." },
                 { "id": "finger_60s",  "name": "One Minute!",  "description": "Survive 60 seconds in Finger." }
             ]
+        },
+        {
+            "id": "colorhop",
+            "name": "Color Hop",
+            "description": "Bounce through rotating rings. Match the color or die.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/colorhop/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/colorhop/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "ch_5",  "name": "5 Hops!",  "description": "Score 5 in Color Hop." },
+                { "id": "ch_15", "name": "15 Hops!", "description": "Score 15 in Color Hop." },
+                { "id": "ch_30", "name": "30 Hops!", "description": "Score 30 in Color Hop." },
+                { "id": "ch_50", "name": "50 Hops!", "description": "Score 50 in Color Hop." }
+            ]
         }
     ]
 }
