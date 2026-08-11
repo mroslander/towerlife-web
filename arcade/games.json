@@ -235,6 +235,42 @@
                 { "id": "dr_600",  "name": "600 Distance!",  "description": "Score 600 in Dash Rush." },
                 { "id": "dr_1000", "name": "1000 Distance!", "description": "Score 1000 in Dash Rush." }
             ]
+        },
+        {
+            "id": "piano",
+            "name": "Piano",
+            "description": "Tap the falling tiles in time. Miss one and it's over.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/piano/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/piano/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "piano_10",  "name": "10 Notes!",   "description": "Tap 10 tiles in Piano." },
+                { "id": "piano_30",  "name": "30 Notes!",   "description": "Tap 30 tiles in Piano." },
+                { "id": "piano_60",  "name": "60 Notes!",   "description": "Tap 60 tiles in Piano." },
+                { "id": "piano_100", "name": "100 Notes!",  "description": "Tap 100 tiles in Piano." }
+            ]
+        },
+        {
+            "id": "zigzagger",
+            "name": "ZigZagger",
+            "description": "Tap to switch direction. Stay on the path. Collect gems.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/zigzagger/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/zigzagger/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "zz_50",  "name": "50 Points!",  "description": "Score 50 in ZigZagger." },
+                { "id": "zz_150", "name": "150 Points!", "description": "Score 150 in ZigZagger." },
+                { "id": "zz_300", "name": "300 Points!", "description": "Score 300 in ZigZagger." },
+                { "id": "zz_500", "name": "500 Points!", "description": "Score 500 in ZigZagger." }
+            ]
         }
     ]
 }
