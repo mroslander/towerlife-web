@@ -255,6 +255,24 @@
             ]
         },
         {
+            "id": "gravityflip",
+            "name": "Gravity Flip",
+            "description": "Auto-runner. Tap to flip gravity. Dodge ceiling and floor obstacles.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/gravityflip/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/gravityflip/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "gf_100",  "name": "100 Distance!",  "description": "Score 100 in Gravity Flip." },
+                { "id": "gf_300",  "name": "300 Distance!",  "description": "Score 300 in Gravity Flip." },
+                { "id": "gf_600",  "name": "600 Distance!",  "description": "Score 600 in Gravity Flip." },
+                { "id": "gf_1000", "name": "1000 Distance!", "description": "Score 1000 in Gravity Flip." }
+            ]
+        },
+        {
             "id": "zigzagger",
             "name": "ZigZagger",
             "description": "Tap to switch direction. Stay on the path. Collect gems.",
