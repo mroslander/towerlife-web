@@ -289,6 +289,26 @@
                 { "id": "zz_300", "name": "300 Points!", "description": "Score 300 in ZigZagger." },
                 { "id": "zz_500", "name": "500 Points!", "description": "Score 500 in ZigZagger." }
             ]
+        },
+        {
+            "id": "merge",
+            "name": "Merge 2048",
+            "description": "Swipe to merge tiles. Reach 2048 to win.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/merge/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/merge/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "merge_512",  "name": "512 Tile!",    "description": "Reach the 512 tile in Merge 2048." },
+                { "id": "merge_1024", "name": "1024 Tile!",   "description": "Reach the 1024 tile in Merge 2048." },
+                { "id": "merge_2048", "name": "2048!",         "description": "Reach the 2048 tile in Merge 2048." },
+                { "id": "merge_1k",   "name": "1 000 Score!", "description": "Score 1 000 points in Merge 2048." },
+                { "id": "merge_5k",   "name": "5 000 Score!", "description": "Score 5 000 points in Merge 2048." },
+                { "id": "merge_10k",  "name": "10 000 Score!", "description": "Score 10 000 points in Merge 2048." }
+            ]
         }
     ]
 }
