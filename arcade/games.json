@@ -217,6 +217,24 @@
                 { "id": "ch_30", "name": "30 Hops!", "description": "Score 30 in Color Hop." },
                 { "id": "ch_50", "name": "50 Hops!", "description": "Score 50 in Color Hop." }
             ]
+        },
+        {
+            "id": "dashrush",
+            "name": "Dash Rush",
+            "description": "Auto-runner. Tap to jump. One hit and it's over.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/dashrush/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/dashrush/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "dr_100",  "name": "100 Distance!",  "description": "Score 100 in Dash Rush." },
+                { "id": "dr_300",  "name": "300 Distance!",  "description": "Score 300 in Dash Rush." },
+                { "id": "dr_600",  "name": "600 Distance!",  "description": "Score 600 in Dash Rush." },
+                { "id": "dr_1000", "name": "1000 Distance!", "description": "Score 1000 in Dash Rush." }
+            ]
         }
     ]
 }
