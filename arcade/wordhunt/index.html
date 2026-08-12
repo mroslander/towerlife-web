@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Word Hunt — TowerLife Arcade</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .game-title {
+      font-size: 40px;
+      letter-spacing: 8px;
+      color: #00ccff;
+      text-shadow: 0 0 12px #00ccff, 0 0 32px rgba(0, 204, 255, 0.45);
+      animation: arcade-pulse 2.4s ease-in-out infinite;
+    }
+
+    #hud .hud-value { color: #00ccff; }
+    #hud #score     { color: #00ff88; }
+    #hud #high      { color: #ffcc00; }
+
+    /* sub-HUD: timer */
+    #sub-hud {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 420px;
+      padding: 0 8px;
+      gap: 8px;
+    }
+    #time-display {
+      font-size: 22px;
+      font-weight: bold;
+      color: #ffcc00;
+      min-width: 34px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    #time-display.urgent {
+      color: #ff3366;
+      animation: arcade-pulse 0.5s ease-in-out infinite;
+    }
+    #timer-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: #0a1a28;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    #timer-bar {
+      height: 100%;
+      width: 100%;
+      background: #00ccff;
+      border-radius: 3px;
+      transition: background-color 0.4s;
+    }
+
+    #canvas-wrapper {
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    #btn-mute {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      z-index: 10;
+    }
+
+    /* word list strip */
+    #word-list-panel {
+      width: 100%;
+      max-width: 420px;
+      padding: 4px 8px 2px;
+      flex-shrink: 0;
+    }
+    #word-list-label {
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: #223344;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    #word-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: center;
+    }
+    .word-chip {
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      padding: 3px 8px;
+      border: 1px solid #1a2840;
+      border-radius: 2px;
+      color: #4a6a8a;
+      transition: color 0.25s, border-color 0.25s;
+    }
+    .word-chip.found {
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+
+    <!-- HUD ──────────────────────────────────────────────────────── -->
+    <div id="hud">
+      <div class="hud-item">
+        <span class="hud-label">SCORE</span>
+        <span id="score" class="hud-value">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">ROUND</span>
+        <span id="round" class="hud-value">1</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">BEST</span>
+        <span id="high" class="hud-value">0</span>
+      </div>
+    </div>
+
+    <!-- Timer bar ────────────────────────────────────────────────── -->
+    <div id="sub-hud">
+      <span id="time-display">60</span>
+      <div id="timer-bar-wrap">
+        <div id="timer-bar"></div>
+      </div>
+    </div>
+
+    <!-- Canvas + overlays ────────────────────────────────────────── -->
+    <div id="canvas-wrapper">
+      <canvas id="game-canvas"></canvas>
+      <button id="btn-mute" class="btn-icon" title="Mute">🔊</button>
+
+      <div id="overlay-start" class="overlay">
+        <h1 class="game-title">WORD HUNT</h1>
+        <p class="overlay-hint">Swipe the letters to find hidden words</p>
+        <button id="btn-start" class="btn-primary">START</button>
+        <p class="overlay-sub">Any direction · Forward or back</p>
+      </div>
+
+      <div id="overlay-over" class="overlay hidden">
+        <h2>TIME'S UP</h2>
+        <div class="overlay-scores">
+          <div class="overlay-score-row">
+            <span class="label">SCORE</span>
+            <span id="final-score" class="value">0</span>
+          </div>
+          <div class="overlay-score-row">
+            <span class="label">BEST</span>
+            <span id="final-high" class="value">0</span>
+          </div>
+          <div class="overlay-score-row">
+            <span class="label">ROUND</span>
+            <span id="final-round" class="value">1</span>
+          </div>
+        </div>
+        <button id="btn-restart" class="btn-primary">PLAY AGAIN</button>
+        <p class="overlay-sub">Swipe · Tap · Enter</p>
+      </div>
+    </div>
+
+    <!-- Word list ────────────────────────────────────────────────── -->
+    <div id="word-list-panel">
+      <div id="word-list-label">FIND THESE WORDS</div>
+      <div id="word-list"></div>
+    </div>
+
+  </div><!-- #game-container -->
+
+  <script src="../common/save.js"></script>
+  <script src="../common/towerlife.js"></script>
+  <script src="../common/audio.js"></script>
+  <script src="../common/achievements.js"></script>
+  <script src="../common/ui.js"></script>
+  <script src="wordhunt.js"></script>
+</body>
+</html>
