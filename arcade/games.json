@@ -309,6 +309,25 @@
                 { "id": "merge_5k",   "name": "5 000 Score!", "description": "Score 5 000 points in Merge 2048." },
                 { "id": "merge_10k",  "name": "10 000 Score!", "description": "Score 10 000 points in Merge 2048." }
             ]
+        },
+        {
+            "id": "taprush",
+            "name": "Tap Rush",
+            "description": "Serve customers before they reach the bar. Tap to pour, tap to catch.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/taprush/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/taprush/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "tr_500",   "name": "500 Points!",   "description": "Score 500 points in Tap Rush." },
+                { "id": "tr_2k",    "name": "2 000 Points!", "description": "Score 2 000 points in Tap Rush." },
+                { "id": "tr_5k",    "name": "5 000 Points!", "description": "Score 5 000 points in Tap Rush." },
+                { "id": "tr_x5",    "name": "5x Combo!",     "description": "Reach a 5x combo in Tap Rush." },
+                { "id": "tr_catch", "name": "Glass Catcher!", "description": "Catch 10 empty glasses in one game." }
+            ]
         }
     ]
 }
