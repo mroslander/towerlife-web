@@ -330,6 +330,26 @@
             ]
         },
         {
+            "id": "remover",
+            "name": "Remover",
+            "description": "Tap a group of same-color tiles to select, tap again to remove. Bigger groups score exponentially more.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/remover/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/remover/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "rem_1k",    "name": "1 000 Points!",   "description": "Score 1 000 points in Remover." },
+                { "id": "rem_5k",    "name": "5 000 Points!",   "description": "Score 5 000 points in Remover." },
+                { "id": "rem_10k",   "name": "10 000 Points!",  "description": "Score 10 000 points in Remover." },
+                { "id": "rem_10",    "name": "10-Tile Blast!",  "description": "Remove 10 tiles in a single move." },
+                { "id": "rem_20",    "name": "20-Tile Bomb!",   "description": "Remove 20 tiles in a single move." },
+                { "id": "rem_clear", "name": "Clean Sweep!",    "description": "Clear the entire board in Remover." }
+            ]
+        },
+        {
             "id": "wordhunt",
             "name": "Word Hunt",
             "description": "Swipe to find hidden words in the letter grid. Any direction counts.",
