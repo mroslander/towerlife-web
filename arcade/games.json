@@ -350,6 +350,24 @@
             ]
         },
         {
+            "id": "stackhop",
+            "name": "Stack Hop",
+            "description": "Tap to jump between rotating platforms. Land on the safe zone.",
+            "url": "https://mroslander.github.io/towerlife-web/arcade/stackhop/index.html",
+            "screenshotUrl": "https://mroslander.github.io/towerlife-web/arcade/stackhop/screenshot.png",
+            "purchasePrice": 100,
+            "playPrice": 1,
+            "starsRequired": 0,
+            "initialFreePlays": 3,
+            "status": "testing",
+            "achievements": [
+                { "id": "sh_5",   "name": "5 Hops!",   "description": "Score 5 in Stack Hop." },
+                { "id": "sh_15",  "name": "15 Hops!",  "description": "Score 15 in Stack Hop." },
+                { "id": "sh_30",  "name": "30 Hops!",  "description": "Score 30 in Stack Hop." },
+                { "id": "sh_50",  "name": "50 Hops!",  "description": "Score 50 in Stack Hop." }
+            ]
+        },
+        {
             "id": "wordhunt",
             "name": "Word Hunt",
             "description": "Swipe to find hidden words in the letter grid. Any direction counts.",
